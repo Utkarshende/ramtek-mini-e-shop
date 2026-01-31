@@ -26,13 +26,12 @@ const handleSubmit = async (e) => {
     data.append('category', formData.category);
     data.append('description', formData.description);
     data.append('location', formData.location);
-    data.append('image', image); // The actual file
-data.append('image', image);
+    data.append('image', image);
 
     try {
      const res = await API.post('/products/add', data, {
       headers: { 'Content-Type': 'multipart/form-data' }
-    });s
+    });
       if(res.data.success) alert("Listed with Image!");
     } catch (err) {
       console.error(err);

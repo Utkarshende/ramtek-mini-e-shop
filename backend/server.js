@@ -1,11 +1,34 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
 
-// Import our new routes
 import productRoutes from './src/routes/productRoutes.js';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+
+import dotenv from 'dotenv';
 dotenv.config();
+
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+
+// DEBUG LOG: If this prints 'undefined' in your terminal, the .env isn't loading!
+console.log("Checking Secret:", process.env.CLOUDINARY_API_SECRET ? "SECRET FOUND" : "SECRET IS MISSING");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET // Ensure this name matches the .env exactly
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ramtek_bazar',
+    allowed_formats: ['jpg', 'png', 'jpeg'],
+  },
+});
+
+export const upload = multer({ storage });
 
 const app = express();
 
@@ -24,11 +47,13 @@ const PORT = process.env.PORT || 5000;
 
 
 app.use((err, req, res, next) => {
-  console.error("SERVER ERROR LOG:", err.stack);
+  // If err is null/undefined, we log the whole object to see what's happening
+  console.error("FULL ERROR OBJECT:", err); 
+  
   res.status(500).json({
     success: false,
-    message: "Internal Server Error",
-    error: err.message // This will tell us if it's a Cloudinary error
+    message: err?.message || "Unknown Server Error",
+    stack: process.env.NODE_ENV === 'development' ? err?.stack : {}
   });
 });
 app.listen(PORT, () => {
