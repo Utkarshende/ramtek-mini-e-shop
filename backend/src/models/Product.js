@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 // Define the structure of a Product post
 const productSchema = new mongoose.Schema({
   title: { 
@@ -37,4 +36,4 @@ const productSchema = new mongoose.Schema({
 });
 
 // Export the model so we can use it in controllers
-module.exports = mongoose.model('Product', productSchema);
+export default mongoose.model('Product', productSchema);

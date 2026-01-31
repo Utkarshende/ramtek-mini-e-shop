@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 // Import our new routes
-import productRoutes from './routes/productRoutes.js';
+import productRoutes from './src/routes/productRoutes.js';
 dotenv.config();
 
 const app = express();

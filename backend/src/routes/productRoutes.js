@@ -1,18 +1,11 @@
 import express from 'express';
-const router = express.Router();
-
+// We use curly braces { } to "destructure" the specific functions we exported
 import { createProduct, getAllProducts } from '../controllers/productController.js';
 
+const router = express.Router();
 
-// Define the path for adding a product
-// This will be accessible at http://localhost:5000/api/products/add
+// Define the endpoints
 router.post('/add', createProduct);
-
 router.get('/all', getAllProducts);
 
-
-
-
-
-// We export this so the main server.js can use it
-module.exports = router;
+export default router;
