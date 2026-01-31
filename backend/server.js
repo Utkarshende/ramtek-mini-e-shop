@@ -1,64 +1,48 @@
-
-import productRoutes from './src/routes/productRoutes.js';
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import multer from 'multer';
-import authRoutes from './src/routes/authRoutes.js';
-import dotenv from 'dotenv';
-import reviewRoutes from './src/routes/reviewRoutes.js';
-dotenv.config();
-
 import express from 'express';
-import cors from 'cors';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
 
-// DEBUG LOG: If this prints 'undefined' in your terminal, the .env isn't loading!
-console.log("Checking Secret:", process.env.CLOUDINARY_API_SECRET ? "SECRET FOUND" : "SECRET IS MISSING");
+// Route Imports
+import authRoutes from './src/routes/authRoutes.js';
+import productRoutes from './src/routes/productRoutes.js';
+import reviewRoutes from './src/routes/reviewRoutes.js';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET // Ensure this name matches the .env exactly
-});
-
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'ramtek_bazar',
-    allowed_formats: ['jpg', 'png', 'jpeg'],
-  },
-});
-
-export const upload = multer({ storage });
-
+// Configuration
+dotenv.config();
 const app = express();
-
-app.use(express.json());
-app.use(cors());
-
-
-app.use('/api/products', productRoutes);
-app.use('/api/auth', authRoutes)
-app.use('/api/reviews', reviewRoutes);
-
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Ramtek Bazar Database Connected"))
-  .catch((err) => console.log("❌ DB Connection Error:", err));
-
 const PORT = process.env.PORT || 5000;
 
+// Middleware
+app.use(cors()); // Allows frontend to communicate with backend
+app.use(express.json()); // Parses incoming JSON requests
+app.use(express.urlencoded({ extended: true }));
 
+// Database Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB Connected: Ramtek Bazar Database'))
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+
+// API Routes
+app.use('/api/auth', authRoutes);       // Login & Register
+app.use('/api/products', productRoutes); // Sell & View Products
+app.use('/api/reviews', reviewRoutes);   // Live Community Feedback
+
+// Base Route for Health Check
+app.get('/', (req, res) => {
+  res.send('Ramtek Bazar API is running smoothly...');
+});
+
+// Global Error Handler
 app.use((err, req, res, next) => {
-  // If err is null/undefined, we log the whole object to see what's happening
-  console.error("FULL ERROR OBJECT:", err); 
-  
-  res.status(500).json({
-    success: false,
-    message: err?.message || "Unknown Server Error",
-    stack: process.env.NODE_ENV === 'development' ? err?.stack : {}
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
 });
+
+// Start Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server started on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

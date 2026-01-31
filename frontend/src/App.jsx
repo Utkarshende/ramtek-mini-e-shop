@@ -7,16 +7,22 @@ import ProductDetails from './pages/ProductDetails.js';
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} /> 
-        <Route path="/register" element={<Register />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-      </Routes>
-    </Router>
+    <div className="flex flex-col min-h-screen">
+      <Router>
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/sell" element={<ProtectedRoute><SellProduct /></ProtectedRoute>} />
+          </Routes>
+        </main>
+        <Footer />
+      </Router>
+    </div>
   );
 }
-
 export default App;
