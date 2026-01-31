@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import API from '../api.js'
-import ProductCard from '../components/ProductCard.js'
+import ProductCard from '../components/ProductCard.jsx'
 import SearchBar from '../components/SearchBar.js'
 
 function Home() {
