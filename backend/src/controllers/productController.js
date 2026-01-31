@@ -3,6 +3,10 @@ import Product from '../models/Product.js';
 // Use 'export' before 'const' so we can pick exactly what we need in the routes
 export const createProduct = async (req, res) => {
   try {
+    console.log("--- New Request Received ---");
+    console.log("Form Data:", req.body);
+    console.log("File Data:", req.file); 
+    
     const { title, description, price, category, location } = req.body;
     
     // req.file.path is the URL provided by Cloudinary
@@ -11,7 +15,7 @@ export const createProduct = async (req, res) => {
     const newProduct = new Product({
       title,
       description,
-      price,
+price: Number(price), // Ensure price is a number 
       category,
       location,
       images: [imageUrl], // Store it in our array

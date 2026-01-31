@@ -12,9 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// --- ROUTES ---
-// This tells the app that every route in productRoutes 
-// should start with /api/products
+
 app.use('/api/products', productRoutes);
 
 
@@ -23,6 +21,16 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.log("❌ DB Connection Error:", err));
 
 const PORT = process.env.PORT || 5000;
+
+
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR LOG:", err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+    error: err.message // This will tell us if it's a Cloudinary error
+  });
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server started on http://localhost:${PORT}`);
 });

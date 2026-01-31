@@ -14,6 +14,10 @@ function SellProduct() {
   });
 const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!image) {
+    alert("Please select an image first!");
+    return;
+  }
     
     // We must use FormData for files!
     const data = new FormData();
@@ -23,11 +27,12 @@ const handleSubmit = async (e) => {
     data.append('description', formData.description);
     data.append('location', formData.location);
     data.append('image', image); // The actual file
+data.append('image', image);
 
     try {
-      const res = await API.post('/products/add', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+     const res = await API.post('/products/add', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });s
       if(res.data.success) alert("Listed with Image!");
     } catch (err) {
       console.error(err);
