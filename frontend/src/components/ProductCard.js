@@ -1,8 +1,11 @@
 import React from 'react'
 import { THEME_COLOR } from '../constants.js'
+import { Link } from 'react-router-dom'
 
 function ProductCard({ item }) {
   return (
+    <div>
+        <Link to={`/product/${item._id}`}>
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
       {/* Image Container */}
       <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
@@ -12,6 +15,7 @@ function ProductCard({ item }) {
           <span>📸 No Image</span>
         )}
       </div>
+      
 
       {/* Content Container */}
       <div className="p-4">
@@ -29,6 +33,8 @@ function ProductCard({ item }) {
           {item.location}
         </div>
       </div>
+    </div>
+    </Link>
     </div>
   )
 }

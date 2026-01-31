@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar.js'
 import Home from './pages/Home.js'
 import SellProduct from './pages/SellProduct.js'
+import ProductDetail from './pages/ProductDetail.js'
 
 function App() {
   return (
@@ -19,9 +20,9 @@ function App() {
           <Routes>
             {/* http://localhost:3000/ */}
             <Route path="/" element={<Home />} />
-
             {/* http://localhost:3000/sell */}
             <Route path="/sell" element={<SellProduct />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
           </Routes>
         </main>
 
