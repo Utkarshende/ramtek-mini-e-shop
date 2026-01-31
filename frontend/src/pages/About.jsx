@@ -52,6 +52,10 @@ function About() {
           </form>
         </div>
       </div>
+      <div className="mt-20 border-t border-slate-900 pt-10 text-center">
+  <h3 className="text-slate-400 uppercase tracking-[0.2em] text-xs mb-4">Get in touch</h3>
+  <p className="text-white hover:text-blue-500 transition-colors cursor-pointer">support@ramtekbazar.com</p>
+</div>
     </div>
   );
 }
