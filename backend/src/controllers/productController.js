@@ -3,35 +3,24 @@ import Product from '../models/Product.js';
 // Use 'export' before 'const' so we can pick exactly what we need in the routes
 export const createProduct = async (req, res) => {
   try {
-    const { title, description, price, category, location, images, sellerId } = req.body;
+    const { title, description, price, category, location } = req.body;
+    
+    // req.file.path is the URL provided by Cloudinary
+    const imageUrl = req.file ? req.file.path : ""; 
 
-    // Create a new instance of the Product model
     const newProduct = new Product({
       title,
       description,
       price,
       category,
       location,
-      images,
-      seller: sellerId
+      images: [imageUrl], // Store it in our array
     });
 
-    // Await the database save operation
-    const savedProduct = await newProduct.save();
-
-    // 201 means "Created" - very important for interviewers!
-    res.status(201).json({
-      success: true,
-      message: "Product listed successfully in Ramtek Bazar!",
-      data: savedProduct
-    });
-
+    await newProduct.save();
+    res.status(201).json({ success: true, message: "Product listed!" });
   } catch (error) {
-    // 500 means "Server Error"
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

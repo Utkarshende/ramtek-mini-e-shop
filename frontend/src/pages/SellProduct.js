@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 function SellProduct() {
   const navigate = useNavigate();
+  const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     price: '',
@@ -11,17 +12,25 @@ function SellProduct() {
     description: '',
     location: 'Ramtek'
   });
-
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // We must use FormData for files!
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('price', formData.price);
+    data.append('category', formData.category);
+    data.append('description', formData.description);
+    data.append('location', formData.location);
+    data.append('image', image); // The actual file
+
     try {
-      const res = await API.post('/products/add', formData);
-      if (res.data.success) {
-        alert("Listing posted!");
-        navigate('/'); // Redirect to home
-      }
+      const res = await API.post('/products/add', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if(res.data.success) alert("Listed with Image!");
     } catch (err) {
-      alert("Error posting product.");
+      console.error(err);
     }
   };
 
@@ -41,6 +50,7 @@ function SellProduct() {
               onChange={(e) => setFormData({...formData, title: e.target.value})}
             />
           </div>
+          
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -77,6 +87,15 @@ function SellProduct() {
               onChange={(e) => setFormData({...formData, description: e.target.value})}
             ></textarea>
           </div>
+          <div className="mb-4">
+      <label className="block text-sm font-bold mb-2">Upload Product Image</label>
+      <input 
+        type="file" 
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files[0])}
+        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-ramtekRed hover:file:bg-red-100"
+      />
+    </div>
 
           <button 
             type="submit"
