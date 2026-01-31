@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import API from '../api.js'
 import ProductCard from '../components/ProductCard.jsx'
-import SearchBar from '../components/SearchBar.js'
+import SearchBar from '../components/SearchBar.jsx'
 
 function Home() {
   const [products, setProducts] = useState([]);

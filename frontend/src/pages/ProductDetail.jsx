@@ -7,7 +7,7 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect(() => {a
     const fetchProduct = async () => {
       try {
         const res = await API.get(`/products/${id}`);
