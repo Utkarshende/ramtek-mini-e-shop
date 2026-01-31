@@ -1,4 +1,4 @@
-const Product = require('../models/Product');
+import Product from '../models/Product.js';
 
 // Function to create a new product listing
 exports.createProduct = async (req, res) => {
