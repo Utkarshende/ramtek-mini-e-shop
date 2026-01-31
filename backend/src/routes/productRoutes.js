@@ -1,11 +1,11 @@
 import express from 'express';
-// We use curly braces { } to "destructure" the specific functions we exported
 import { createProduct, getAllProducts } from '../controllers/productController.js';
+import { upload } from '../config/cloudinary.js';
 
 const router = express.Router();
 
-// Define the endpoints
-router.post('/add', createProduct);
+// 'images' matches the name we will use in the Frontend form
+router.post('/add', upload.single('image'), createProduct);
 router.get('/all', getAllProducts);
 
 export default router;
