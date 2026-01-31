@@ -5,6 +5,7 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import authRoutes from './src/routes/authRoutes.js';
 import dotenv from 'dotenv';
+import reviewRoutes from './src/routes/reviewRoutes.js';
 dotenv.config();
 
 import express from 'express';
@@ -38,6 +39,7 @@ app.use(cors());
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes)
+app.use('/api/reviews', reviewRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)
