@@ -1,111 +1,93 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react'
+import API from '../api.js'
+import { useNavigate } from 'react-router-dom'
 
-const SellProduct = () => {
-  // 1. STATE: We create an object to hold all the form data
+function SellProduct() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     price: '',
     category: 'Electronics',
-    location: 'Ramtek, Nagpur'
+    description: '',
+    location: 'Ramtek'
   });
 
-  // 2. HANDLER: This function updates the state as the user types
-  const handleChange = (e) => {
-    // [e.target.name] matches the 'name' attribute of the input
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // 3. SUBMIT: This function sends the data to your Node.js backend
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents the browser from refreshing the page
-    
+    e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/products/add', formData);
-      
-      if (response.data.success) {
-        alert("Success! Your item is listed in Ramtek Bazar.");
-        // Reset form after success
-        setFormData({ title: '', description: '', price: '', category: 'Electronics', location: 'Ramtek, Nagpur' });
+      const res = await API.post('/products/add', formData);
+      if (res.data.success) {
+        alert("Listing posted!");
+        navigate('/'); // Redirect to home
       }
-    } catch (error) {
-      console.error("Error posting product:", error);
-      alert("Failed to post item. Check if Backend is running!");
+    } catch (err) {
+      alert("Error posting product.");
     }
   };
 
   return (
-    <div style={containerStyle}>
-      <h2 style={{ textAlign: 'center' }}>Sell Something in Ramtek</h2>
-      
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <label>Product Title</label>
-        <input 
-          name="title" 
-          value={formData.title} 
-          onChange={handleChange} 
-          placeholder="e.g. KITS Second year Books" 
-          style={inputStyle}
-          required 
-        />
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sell an Item</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Product Title</label>
+            <input 
+              type="text"
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-ramtekRed focus:ring-2 focus:ring-red-100 outline-none transition-all"
+              placeholder="e.g. Used Engineering Drafter"
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+            />
+          </div>
 
-        <label>Price (₹)</label>
-        <input 
-          name="price" 
-          type="number" 
-          value={formData.price} 
-          onChange={handleChange} 
-          placeholder="Enter amount" 
-          style={inputStyle}
-          required 
-        />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Price (₹)</label>
+              <input 
+                type="number"
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-ramtekRed focus:ring-2 focus:ring-red-100 outline-none transition-all"
+                placeholder="500"
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+              <select 
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-ramtekRed outline-none transition-all bg-white"
+                onChange={(e) => setFormData({...formData, category: e.target.value})}
+              >
+                <option value="Electronics">Electronics</option>
+                <option value="Books">Books</option>
+                <option value="Agri-Tools">Agri-Tools</option>
+                <option value="Furniture">Furniture</option>
+              </select>
+            </div>
+          </div>
 
-        <label>Category</label>
-        <select name="category" value={formData.category} onChange={handleChange} style={inputStyle}>
-          <option value="Electronics">Electronics</option>
-          <option value="Books">Books</option>
-          <option value="Agri-Tools">Agri-Tools</option>
-          <option value="Furniture">Furniture</option>
-        </select>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+            <textarea 
+              required
+              rows="4"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-ramtekRed focus:ring-2 focus:ring-red-100 outline-none transition-all"
+              placeholder="Describe condition, age, and why you are selling..."
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+            ></textarea>
+          </div>
 
-        <label>Description</label>
-        <textarea 
-          name="description" 
-          value={formData.description} 
-          onChange={handleChange} 
-          placeholder="Tell buyers about your item..." 
-          style={{ ...inputStyle, height: '100px' }}
-          required 
-        />
-
-        <button type="submit" style={buttonStyle}>Post My Ad</button>
-      </form>
+          <button 
+            type="submit"
+            className="w-full bg-ramtekRed text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-red-600 transition-colors active:scale-95"
+          >
+            List Item Now
+          </button>
+        </form>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-// --- Clean UI Styles ---
-const containerStyle = { padding: '40px 10%', maxWidth: '600px', margin: 'auto' };
-
-const formStyle = { display: 'flex', flexDirection: 'column', gap: '15px' };
-
-const inputStyle = {
-  padding: '12px',
-  borderRadius: '8px',
-  border: '1px solid #ccc',
-  fontSize: '1rem'
-};
-
-const buttonStyle = {
-  backgroundColor: '#FF4D4D',
-  color: 'white',
-  padding: '15px',
-  border: 'none',
-  borderRadius: '8px',
-  cursor: 'pointer',
-  fontWeight: 'bold',
-  fontSize: '1.1rem'
-};
-
-export default SellProduct;
+export default SellProduct
