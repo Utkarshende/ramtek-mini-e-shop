@@ -21,7 +21,7 @@ return (
           </button>
         </>
       ) : (
-        <a href="/auth" className="text-white bg-blue-600 px-5 py-2 rounded-lg hover:bg-blue-500 transition-all">
+        <a href="/login" className="text-white bg-blue-600 px-5 py-2 rounded-lg hover:bg-blue-500 transition-all">
           Login
           
         </a>
