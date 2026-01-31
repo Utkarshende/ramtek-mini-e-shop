@@ -1,34 +1,20 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-
-// Import our custom components and pages
-import Navbar from './components/Navbar.js'
-import Home from './pages/Home.js'
-import SellProduct from './pages/SellProduct.js'
-import ProductDetail from './pages/ProductDetail.js'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './pages/LoginPage.js';
+import Register from './pages/RegisterPage.js';
+import Home from './pages/Home.js';
+import Navbar from './components/Navbar.js';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        
-        {/* Navbar is outside <Routes> so it stays at the top of every page */}
-        <Navbar />
-
-        {/* This area changes based on the URL path */}
-        <main>
-          <Routes>
-            {/* http://localhost:3000/ */}
-            <Route path="/" element={<Home />} />
-            {/* http://localhost:3000/sell */}
-            <Route path="/sell" element={<SellProduct />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-          </Routes>
-        </main>
-
-      </div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
