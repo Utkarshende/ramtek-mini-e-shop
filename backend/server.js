@@ -3,7 +3,7 @@ import productRoutes from './src/routes/productRoutes.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
-
+import authRoutes from './src/routes/authRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -37,6 +37,7 @@ app.use(cors());
 
 
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes)
 
 
 mongoose.connect(process.env.MONGO_URI)

@@ -9,57 +9,75 @@ const Auth = () => {
     e.preventDefault();
     const endpoint = isLogin ? '/auth/login' : '/auth/register';
     try {
-      const res = await API.post(endpoint, formData);
-      localStorage.setItem('token', res.data.token);
-      alert("Welcome to Ramtek Bazar!");
+      const { data } = await API.post(endpoint, formData);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      alert(data.message);
       window.location.href = '/';
     } catch (err) {
-      alert(err.response?.data?.message || "Auth Failed");
+      alert(err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          {!isLogin && (
-            <input 
-              style={styles.input} 
-              placeholder="Full Name" 
-              onChange={(e) => setFormData({...formData, name: e.target.value})} 
-            />
-          )}
-          <input 
-            style={styles.input} 
-            placeholder="Email Address" 
-            type="email" 
-            onChange={(e) => setFormData({...formData, email: e.target.value})} 
-          />
-          <input 
-            style={styles.input} 
-            placeholder="Password" 
-            type="password" 
-            onChange={(e) => setFormData({...formData, password: e.target.value})} 
-          />
-          <button style={styles.button}>{isLogin ? 'Login' : 'Sign Up'}</button>
-        </form>
-        <p style={styles.toggleText} onClick={() => setIsLogin(!isLogin)}>
-          {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
+    <div className="min-h-[90vh] flex items-center justify-center bg-slate-950 px-4">
+      <div className="w-full max-w-md p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-white text-center mb-2">
+          {isLogin ? 'Welcome Back' : 'Join the Bazar'}
+        </h2>
+        <p className="text-slate-400 text-center mb-8 text-sm">
+          {isLogin ? 'Enter your details to access your account' : 'Start selling and buying in Ramtek today'}
         </p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {!isLogin && (
+            <div>
+              <label className="block text-slate-300 text-sm mb-1">Full Name</label>
+              <input 
+                type="text"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+                placeholder="John Doe"
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-1">Email Address</label>
+            <input 
+              type="email"
+              className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              placeholder="name@email.com"
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 text-sm mb-1">Password</label>
+            <input 
+              type="password"
+              className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
+              placeholder="••••••••"
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+          </div>
+
+          <button className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all transform active:scale-[0.98]">
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <button 
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-slate-400 hover:text-white text-sm transition-colors"
+          >
+            {isLogin ? "New here? Create an account" : "Already have an account? Sign in"}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-const styles = {
-  container: { height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172a' },
-  card: { padding: '40px', backgroundColor: '#1e293b', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.3)', width: '350px', textAlign: 'center' },
-  title: { color: '#f8fafc', marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' },
-  form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-  input: { padding: '12px', borderRadius: '6px', border: '1px solid #334155', backgroundColor: '#0f172a', color: '#fff', outline: 'none' },
-  button: { padding: '12px', borderRadius: '6px', border: 'none', backgroundColor: '#3b82f6', color: '#fff', fontWeight: '600', cursor: 'pointer', transition: '0.3s' },
-  toggleText: { color: '#94a3b8', marginTop: '15px', cursor: 'pointer', fontSize: '14px' }
-};
-
-export default Auth;e
+export default Auth;
