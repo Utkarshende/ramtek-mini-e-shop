@@ -4,9 +4,9 @@ import multer from 'multer';
 
 // Configuration (Use your credentials from Cloudinary Dashboard)
 cloudinary.config({
-  cloud_name: 'your_cloud_name',
-  api_key: 'your_api_key',
-  api_secret: 'your_api_secret'
+  cloud_name: process.env.e,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
 
 const storage = new CloudinaryStorage({
