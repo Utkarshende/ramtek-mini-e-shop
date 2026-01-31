@@ -1,16 +1,16 @@
 import axios from 'axios';
-import { API_BASE_URL } from './constants.js';
 
-// We create an axios instance. 
-// Think of this as a pre-configured "Messenger" that knows where to go.
 const API = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: 'http://localhost:5000/api'
 });
 
-/**
- * For now, this is a simple instance. 
- * Later, when we add Authentication, we will add an "Intercepter" here 
- * to automatically attach the User Token to every request.
- */
+// This adds the token to EVERY request automatically
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+});
 
 export default API;
