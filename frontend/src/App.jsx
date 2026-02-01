@@ -8,6 +8,7 @@ import About from './pages/About.jsx';
 import SellProduct from './pages/SellProduct.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import MyListings from './pages/MyListings.jsx';
 
 function App() {
   return (
@@ -23,6 +24,14 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/sell" element={<ProtectedRoute><SellProduct /></ProtectedRoute>} />
+            <Route 
+  path="/my-listings" 
+  element={
+    <ProtectedRoute>
+      <MyListings />
+    </ProtectedRoute>
+  } 
+/>
           </Routes>
         </main>
         <Footer />
