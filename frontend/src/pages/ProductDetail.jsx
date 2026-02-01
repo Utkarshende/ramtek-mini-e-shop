@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import API from '../api.js';
+import StarRating from '../components/StarRating.jsx';
 
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
   const [isModelOpen,setIsModelOpen]=useState(false);
+const [userRating,setUserRating]=useState(0);
+
+const submitRating=async()=>{
+  await API.post(`/users/${product.seller._id}/rate`,{rating:userRating});
+  alert("Rating submitted!");
+}
+
 
   useEffect(() => {
     const getProduct = async () => {
@@ -84,6 +92,23 @@ function ProductDetails() {
           alt="Full view"/>
           </div>
       )}
+      <div className="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+  <p className="text-slate-400 text-xs uppercase mb-2">Seller Reputation</p>
+  
+  <div className="flex items-center gap-3">
+    <StarRating rating={product.seller.rating} />
+    <span className="text-white text-sm font-bold">{product.seller.rating.toFixed(1)}</span>
+    <span className="text-slate-600 text-xs">({product.seller.numReviews} reviews)</span>
+  </div>
+  
+  <div className="mt-4 pt-4 border-t border-slate-900">
+    <p className="text-slate-500 text-[10px] mb-2">Have you bought from this seller? Rate them:</p>
+    <div className="flex items-center justify-between">
+      <StarRating rating={userRating} setRating={setUserRating} interactive />
+      <button onClick={submitRating} className="text-blue-500 text-xs font-bold hover:underline">Submit</button>
+    </div>
+  </div>
+</div>
     </div>
   );
 }

@@ -8,6 +8,9 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ success: false, message: "File upload failed at Multer level" });
     }
     const { title, description, price, category, location } = req.body;
+
+const product = await Product.findById(req.params.id).populate('seller','name rating numReviews');
+
     const newProduct = new Product({
       title,
       description,
