@@ -26,6 +26,9 @@ function ProductDetails() {
         {/* Left: Image Section */}
         <div className="space-y-4">
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 group">
+           <div className='relative overflow-hidden rounded-2xl border border-slate-800 group'>
+            Click to expand
+           </div>
             <img 
               src={mainImg} 
               onClick={()=>setIsModelOpen(true)}
