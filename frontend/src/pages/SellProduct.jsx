@@ -3,6 +3,10 @@ import API from '../api.js'
 import { useNavigate } from 'react-router-dom'
 
 function SellProduct() {
+
+const [files, setFiles] = useState([]);
+const [previews, setPreviews] = useState([]);
+
   const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
@@ -12,29 +16,33 @@ function SellProduct() {
     description: '',
     location: 'Ramtek'
   });
+  
+
+  const handleImageChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+
+    // Create temporary URLs to show the user what they selected
+    const previewUrls = selectedFiles.map(file => URL.createObjectURL(file));
+    setPreviews(previewUrls);
+  };
 const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image) {
-    alert("Please select an image first!");
-    return;
-  }
-    
-    // We must use FormData for files!
     const data = new FormData();
-    data.append('title', formData.title);
-    data.append('price', formData.price);
-    data.append('category', formData.category);
-    data.append('description', formData.description);
-    data.append('location', formData.location);
-    data.append('image', image);
+    
+    // Append text fields
+    Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    
+    // Append all selected images
+    files.forEach(file => data.append('images', file));
 
     try {
-     const res = await API.post('/products/add', data, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-      if(res.data.success) alert("Listed with Image!");
+      await API.post('/products/create', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      alert("Product listed successfully!");
     } catch (err) {
-      console.error(err);
+      alert("Upload failed. Make sure your backend can handle multiple files.");
     }
   };
 
@@ -55,7 +63,6 @@ const handleSubmit = async (e) => {
             />
           </div>
           
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Price (₹)</label>

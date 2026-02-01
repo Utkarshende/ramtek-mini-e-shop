@@ -27,7 +27,9 @@ const productSchema = new mongoose.Schema({
   }],
   seller: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User' // Links the product to a specific User
+    ref: 'User', // Links the product to a specific User
+    required: true
+  
   },
 phoneNumber:
  { type: String,
@@ -36,6 +38,7 @@ phoneNumber:
     type: Date, 
     default: Date.now 
   }
+
 });
 
 // Export the model so we can use it in controllers

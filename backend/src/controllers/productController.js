@@ -11,6 +11,15 @@ export const createProduct = async (req, res) => {
 
 const product = await Product.findById(req.params.id).populate('seller','name rating numReviews');
 
+if (!product) {
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="text-blue-500 animate-pulse font-bold tracking-widest">
+        LOADING DETAILS...
+      </div>
+    </div>
+  );
+}
     const newProduct = new Product({
       title,
       description,
@@ -50,7 +59,9 @@ export const getAllProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+    .populate('seller', 'name rating numReviews');
+    
     if (!product) return res.status(404).json({ success: false, message: "Not found" });
     
     res.status(200).json({ success: true, data: product });
@@ -58,3 +69,4 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+

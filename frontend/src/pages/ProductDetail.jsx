@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import API from '../api';
+import API from '../api.js';
 import StarRating from '../components/StarRating';
 
 function ProductDetails() {
@@ -10,6 +10,8 @@ function ProductDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [loading, setLoading] = useState(true);
+const [related, setRelated] = useState([]);
+
 
   useEffect(() => {
     const getProduct = async () => {
@@ -26,22 +28,69 @@ function ProductDetails() {
     getProduct();
   }, [id]);
 
+  // 2. Update your useEffect to fetch related items
+useEffect(() => {
+  const getProduct = async () => {
+    try {
+      const { data } = await API.get(`/products/${id}`);
+      setProduct(data.data);
+      setMainImg(data.data.images[0]);
+
+      // Fetch related items by category
+      const relatedRes = await API.get(`/products/all?category=${data.data.category}`);
+      // Filter out the current product so it doesn't recommend itself
+      const filtered = relatedRes.data.data.filter(item => item._id !== id);
+      setRelated(filtered.slice(0, 4)); // Show top 4
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  getProduct();
+}, [id]);
+
+
+const handleShare = async () => {
+  const shareData = {
+    title: product.title,
+    text: `Check out this ${product.title} on Ramtek Bazar!`,
+    url: window.location.href, // Gets the current page URL
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      // Fallback for browsers that don't support Web Share (like older desktops)
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    }
+  } catch (err) {
+    console.error("Error sharing:", err);
+  }
+};
+
   const handleContact = () => {
     const message = `Hi, I saw your listing for "${product.title}" on Ramtek Bazar. Is it still available?`;
     const whatsappUrl = `https://wa.me/91${product.phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  const submitRating = async () => {
-    if (userRating === 0) return alert("Please select a star rating first.");
-    try {
-      await API.post(`/users/${product.seller?._id}/rate`, { rating: userRating });
-      alert("Thanks for rating the seller!");
-    } catch (err) {
-      alert("Failed to submit rating.");
-    }
-  };
+const submitRating = async () => {
+  console.log("Target Seller ID:", product.seller?._id); // Debug this!
+  
+  if (!product.seller?._id) {
+    return alert("Seller information is missing.");
+  }
 
+  try {
+    await API.post(`/users/${product.seller._id}/rate`, { rating: userRating });
+    alert("Thanks for rating!");
+  } catch (err) {
+    console.error(err);
+  }
+};
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -125,15 +174,46 @@ function ProductDetails() {
               </button>
             </div>
           </div>
-
+          <div className="mt-8 flex gap-4">
           <button 
-            onClick={handleContact}
-            className="mt-8 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-900/20 active:scale-[0.98]"
-          >
-            <span className="text-lg">Chat with Seller</span>
-          </button>
+    onClick={handleContact}
+    className="flex-[3] bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-900/20"
+  >
+    Chat with Seller
+  </button>
+  <button 
+    onClick={handleShare}
+    className="flex-1 bg-slate-800 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white rounded-2xl transition-all flex items-center justify-center"
+    title="Share Listing"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0-10.628a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5m0 10.628a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5" />
+    </svg>
+  </button>
+  </div>
         </div>
       </div>
+  
+<div className="max-w-6xl w-full mt-20">  
+  <h2 className="text-2xl font-bold text-white mb-8 px-2">
+    More from <span className="text-blue-500">{product.category}</span>
+  </h2>
+  
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+    {related.map(item => (
+      <a href={`/product/${item._id}`} key={item._id} className="group">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all">
+          <img src={item.images[0]} className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
+          <div className="p-4">
+            <h3 className="text-white text-sm font-semibold truncate">{item.title}</h3>
+            <p className="text-blue-500 font-bold mt-1">₹{item.price}</p>
+          </div>
+        </div>
+      </a>
+    ))}
+  </div>
+</div>
+
 
       {/* Full Screen Lightbox Modal */}
       {isModalOpen && (
