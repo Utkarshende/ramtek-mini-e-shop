@@ -29,6 +29,9 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' // Links the product to a specific User
   },
+phoneNumber:
+ { type: String,
+   required: true },
   createdAt: { 
     type: Date, 
     default: Date.now 
