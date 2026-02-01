@@ -6,6 +6,7 @@ function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
+  const [isModelOpen,setIsModelOpen]=useState(false);
 
   useEffect(() => {
     const getProduct = async () => {
@@ -27,6 +28,7 @@ function ProductDetails() {
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 group">
             <img 
               src={mainImg} 
+              onClick={()=>setIsModelOpen(true)}
               alt={product.title} 
               className="w-full h-[450px] object-cover transition-transform duration-500 ease-out group-hover:scale-150 cursor-zoom-in"
               onMouseMove={(e) => {
@@ -71,6 +73,14 @@ function ProductDetails() {
           </button>
         </div>
       </div>
+      {isModelOpen && (
+        <div className='fixed insert-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm'
+        onClick={()=> setIsModelOpen(false)}>
+          <button className='absolute top-10 right-10 text-white text-4xl'>&times;</button>
+          <img src={mainImg}className='maz-w-full max-h-full rounded-lg shadow-2xl trabsition-transform duration-300'
+          alt="Full view"/>
+          </div>
+      )}
     </div>
   );
 }
