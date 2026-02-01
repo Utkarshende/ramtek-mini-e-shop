@@ -99,6 +99,18 @@ const handleSubmit = async (e) => {
         onChange={(e) => setImage(e.target.files[0])}
         className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-ramtekRed hover:file:bg-red-100"
       />
+      {/* Add this input field to your form */}
+<div>
+  <label className="block text-slate-400 text-sm mb-1 ml-1">WhatsApp Number (10 digits)</label>
+  <input 
+    type="tel" 
+    pattern="[0-9]{10}"
+    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none"
+    placeholder="9876543210"
+    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+    required
+  />
+</div>
     </div>
 
           <button 
