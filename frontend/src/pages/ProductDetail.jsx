@@ -7,7 +7,7 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {a
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await API.get(`/products/${id}`);
@@ -20,6 +20,15 @@ function ProductDetail() {
     };
     fetchProduct();
   }, [id]);
+
+
+  const handleContact = () => {
+  const message = `Hi, I saw your listing for "${product.title}" on Ramtek Bazar. Is it still available?`;
+  // Replace with the seller's phone. 91 is India's country code.
+  const whatsappUrl = `https://wa.me/91${product.phoneNumber}?text=${encodeURIComponent(message)}`;
+  
+  window.open(whatsappUrl, '_blank');
+};
 
   if (loading) return <div className="text-center mt-20">Loading details...</div>;
   if (!product) return <div className="text-center mt-20">Product not found.</div>;
@@ -58,9 +67,13 @@ function ProductDetail() {
           </div>
 
           {/* Call to Action Button */}
-          <button className="mt-10 bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-xl active:scale-95">
-            Contact Seller
-          </button>
+          <button 
+  onClick={handleContact}
+  className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+>
+  {/* Simple WhatsApp-style icon using text or SVG */}
+  <span>Contact via WhatsApp</span>
+</button>
         </div>
       </div>
     </div>
