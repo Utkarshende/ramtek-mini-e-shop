@@ -124,7 +124,7 @@ const handleSubmit = async (e) => {
             type="submit"
             className="w-full bg-ramtekRed text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-red-600 transition-colors active:scale-95"
           >
-            List Item Now
+            List Item 
           </button>
         </form>
       </div>
