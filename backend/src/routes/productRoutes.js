@@ -1,50 +1,35 @@
 import express from 'express';
-import { createProduct, getAllProducts } from '../controllers/productController.js';
-import { upload } from '../config/cloudinary.js';
-import { getProductById } from '../controllers/productController.js';
 import multer from 'multer';
-const upload = multer ({dest:'uploads/'});
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { 
+  getProducts, 
+  getProductById, 
+  createProduct, 
+  deleteProduct 
+} from '../controllers/productController.js';
 
 const router = express.Router();
 
-// 'images' matches the name we will use in the Frontend form
+// 1. Configure Cloudinary Storage right here
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ramtek_bazar_products',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
 
-// Update the POST route to handle Multer errors manually
-router.post('/add', (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
-    if (err) {
-      console.error("MULTER/CLOUDINARY ERROR:", err);
-      return res.status(500).json({ 
-        success: false, 
-        message: "File upload failed", 
-        error: err.message 
-      });
-    }
-    // If no error, proceed to the controller
-    next();
-  });
-}, createProduct);
-router.get('/all', getAllProducts);
+const upload = multer({ storage: storage });
+
+// 2. Routes
+router.get('/all', getProducts);
 router.get('/:id', getProductById);
 
-// Use upload.array('images', 5) to allow up to 5 files
-router.post('/create', upload.array('images', 5), async (req, res) => {
-  try {
-    // req.files will now be an array of files
-    // You would upload these to Cloudinary here
-    const imageUrls = req.files.map(file => file.path); 
+// 3. Add the upload.array middleware back in
+// 'images' must match the name in your React FormData
+router.post('/create', upload.array('images', 5), createProduct);
 
-    const newProduct = new Product({
-      ...req.body,
-      images: imageUrls, // Save the array of strings
-      seller: req.user._id // From your auth middleware
-    });
-
-    await newProduct.save();
-    res.status(201).json({ message: "Product created!" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.delete('/:id', deleteProduct);
 
 export default router;
