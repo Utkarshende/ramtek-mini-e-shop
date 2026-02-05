@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api';
+import API from '../api.js';
 
 function SellProduct() {
   const [files, setFiles] = useState([]);
@@ -13,7 +13,6 @@ function SellProduct() {
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     
-    // Limit to 5 images total
     if (files.length + selectedFiles.length > 5) {
       return alert("You can only upload up to 5 images.");
     }

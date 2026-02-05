@@ -31,5 +31,7 @@ router.get('/:id', getProductById);
 router.post('/create', upload.array('images', 5), createProduct);
 
 router.delete('/:id', deleteProduct);
+// Add this route
+router.get('/user/me', getMyProducts);
 
 export default router;
