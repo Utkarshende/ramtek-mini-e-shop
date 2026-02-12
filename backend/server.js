@@ -17,15 +17,19 @@ const app = express();
 
 // 1. IMPROVED MIDDLEWARE
 app.use(cors({
-  // When you get your Vercel URL, add it to this array
-  origin: ["http://localhost:5173", "https://your-ramtek-bazar.vercel.app"], 
+  // Add your Vercel URL here once you deploy the frontend
+  origin: [
+    "http://localhost:5173", 
+    "https://ramtek-shop.netlify.app/", // Replace with your actual Vercel URL
+    "https://ramtek-bazar-backend.onrender.com"
+  ], 
   credentials: true
 }));
 app.use(express.json());
 
 // 2. HEALTH CHECK ROUTE
 app.get('/', (req, res) => {
-  res.send('🚀 Ramtek Bazar API is running smoothly...');
+  res.send('🚀 Ramtek Bazar API is running smoothly at https://ramtek-bazar-backend.onrender.com');
 });
 
 // Routes
@@ -36,7 +40,7 @@ app.use('/api/users', userRoutes);
 
 // 3. GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Still logs to Render console so YOU can see it
+  console.error(err.stack); 
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
     success: false,
@@ -47,4 +51,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🔗 Live URL: https://ramtek-bazar-backend.onrender.com`);
 });
