@@ -36,10 +36,11 @@ app.use('/api/users', userRoutes);
 
 // 3. GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
+  console.error(err.stack); // Still logs to Render console so YOU can see it
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
+    success: false,
     message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
 });
 
