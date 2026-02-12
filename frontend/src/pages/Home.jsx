@@ -6,44 +6,60 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
 
   const categories = ["All", "Electronics", "Vehicles", "Furniture", "Real Estate", "Books"];
 
+  // Fetch products whenever category or search changes (Server-side filtering)
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const { data } = await API.get('/products/all');
+        // We use the backend's ability to filter to save bandwidth
+        const { data } = await API.get(`/products/all?category=${selectedCategory}&search=${searchTerm}`);
         setProducts(data.data);
       } catch (err) {
-        console.error("Failed to fetch products");
+        console.error("Failed to fetch products", err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProducts();
-  }, []);
 
-  // Filtering Logic
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+    // Debounce search input: wait 500ms after user stops typing to call API
+    const delayDebounce = setTimeout(() => {
+      fetchProducts();
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [selectedCategory, searchTerm]);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6">
-      {/* Search and Filter Header */}
-      <div className="max-w-7xl mx-auto mb-10">
-        <h1 className="text-3xl font-bold text-white mb-6">Explore <span className="text-blue-500">Ramtek</span></h1>
+    <div className="min-h-screen bg-slate-950 p-6 md:p-10">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-10">
+          <h1 className="text-4xl font-extrabold text-white mb-2">
+            Explore <span className="text-blue-500">Ramtek</span>
+          </h1>
+          <p className="text-slate-500 font-medium">Find the best deals in your local bazar.</p>
+        </div>
         
-        <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
-          <input 
-            type="text"
-            placeholder="Search items (e.g. iPhone, Pulsar...)"
-            className="w-full md:flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-all"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-900 p-4 rounded-3xl border border-slate-800 mb-12 shadow-2xl">
+          <div className="relative w-full md:flex-1">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+            <input 
+              type="text"
+              placeholder="Search items (e.g. iPhone, Pulsar...)"
+              className="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-10 pr-4 py-3 text-white focus:border-blue-500 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           
           <select 
-            className="w-full md:w-64 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none cursor-pointer focus:border-blue-500"
+            className="w-full md:w-64 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white outline-none cursor-pointer focus:border-blue-500 transition-all"
+            value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             {categories.map(cat => (
@@ -51,28 +67,58 @@ function Home() {
             ))}
           </select>
         </div>
-      </div>
 
-      {/* Grid Display */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <Link to={`/product/${product._id}`} key={product._id} className="group">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all">
-                <img src={product.images[0]} alt={product.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-white font-semibold truncate">{product.title}</h3>
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xl font-bold text-white">₹{product.price}</span>
-                    <span className="text-xs text-slate-500 uppercase">{product.category}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))
+        {/* Grid Display */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-blue-500 animate-spin text-3xl">⚙️</div>
+          </div>
         ) : (
-          <div className="col-span-full text-center py-20 text-slate-500">
-            No items found matching your search.
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.length > 0 ? (
+              products.map((product) => (
+                <Link to={`/product/${product._id}`} key={product._id} className="group">
+                  <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 flex flex-col h-full shadow-lg">
+                    {/* Image Container */}
+                    <div className="relative aspect-square overflow-hidden">
+                      <img 
+                        src={product.images[0]} 
+                        alt={product.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                      />
+                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white font-bold uppercase tracking-widest">
+                        {product.category}
+                      </div>
+                    </div>
+
+                    {/* Content Container */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="text-white font-bold text-lg truncate group-hover:text-blue-400 transition-colors">
+                        {product.title}
+                      </h3>
+                      <div className="mt-auto pt-4 flex justify-between items-center">
+                        <span className="text-2xl font-black text-white">
+                          ₹{product.price.toLocaleString('en-IN')}
+                        </span>
+                        <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                          →
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-24 bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-800">
+                <p className="text-slate-500 text-xl font-medium">No items found in {selectedCategory}.</p>
+                <button 
+                  onClick={() => {setSearchTerm(""); setSelectedCategory("All");}}
+                  className="mt-4 text-blue-500 hover:underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
