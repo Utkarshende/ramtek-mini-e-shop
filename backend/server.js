@@ -15,32 +15,28 @@ connectDB();
 
 const app = express();
 
-// 1. IMPROVED MIDDLEWARE
+// ✅ MIDDLEWARE
 app.use(cors({
-  origin: "https://ramtek-shop.netlify.app", // NO trailing slash
+  origin: "https://ramtek-shop.netlify.app", 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-app.options("*", cors());
+app.use(express.json());  // MUST come before routes
 
-app.use('/api/auth', authRoutes);
-
-app.use(express.json());
-
-// 2. HEALTH CHECK ROUTE
+// ✅ HEALTH CHECK
 app.get('/', (req, res) => {
   res.send('🚀 Ramtek Bazar API is running smoothly at https://ramtek-bazar-backend.onrender.com');
 });
 
-// Routes
+// ✅ ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 
-// 3. GLOBAL ERROR HANDLER
+// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error(err.stack); 
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
@@ -51,6 +47,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🔗 Live URL: https://ramtek-bazar-backend.onrender.com`);
