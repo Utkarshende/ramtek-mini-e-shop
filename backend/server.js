@@ -17,14 +17,16 @@ const app = express();
 
 // 1. IMPROVED MIDDLEWARE
 app.use(cors({
-  // Add your Vercel URL here once you deploy the frontend
-  origin: [
-    "http://localhost:5173", 
-    "https://ramtek-shop.netlify.app/", // Replace with your actual Vercel URL
-    "https://ramtek-bazar-backend.onrender.com"
-  ], 
+  origin: "https://ramtek-shop.netlify.app", // NO trailing slash
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+app.options("*", cors());
+
+app.use('/api/auth', authRoutes);
+
 app.use(express.json());
 
 // 2. HEALTH CHECK ROUTE
