@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+const API = axios.create({ 
+  baseURL: 'https://ramtek-bazar-backend.onrender.com/api' 
 });
 
 // This adds the token to EVERY request automatically
