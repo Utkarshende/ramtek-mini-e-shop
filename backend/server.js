@@ -15,22 +15,22 @@ connectDB();
 
 const app = express();
 
-// ✅ UPDATED CORS MIDDLEWARE
+// ✅ UPDATED CORS CONFIGURATION
 const allowedOrigins = [
   "https://ramtek-shop.netlify.app", // Production
-  "http://localhost:3000",           // Local React (Standard)
-  "http://localhost:5173"            // Local Vite (Standard)
+  "http://localhost:3000",           // React default
+  "http://localhost:5173"            // Vite default
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
+    // Allow requests with no origin (like Postman or mobile apps)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('CORS Policy: This origin is not allowed'));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
