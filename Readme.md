@@ -36,8 +36,8 @@ Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in act
 
 3. **Install frontend deps:**
    ```bash
-  cd frontend
-  npm install
+   cd frontend
+   npm install
 
 ## Running locally (dev)
 
