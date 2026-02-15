@@ -3,28 +3,52 @@ import Review from '../models/Review.js';
 
 const router = express.Router();
 
-// GET all reviews
+// @desc    GET all reviews
+// @route   GET /api/reviews
 router.get('/', async (req, res) => {
   try {
     const reviews = await Review.find().sort({ createdAt: -1 });
-    res.status(200).json(reviews);
+    
+    // Wrapping in an object makes it easier to expand later (e.g., adding pagination)
+    res.status(200).json({
+      success: true,
+      count: reviews.length,
+      data: reviews
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching reviews" });
+    console.error("Review Fetch Error:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error fetching reviews from database" 
+    });
   }
 });
 
-// POST a new review
+// @desc    POST a new review
+// @route   POST /api/reviews
 router.post('/', async (req, res) => {
   try {
-    const { user, comment } = req.body;
+    const { user, comment, rating } = req.body; // Added rating in case you want it later
+    
     if (!user || !comment) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please provide both a name and a comment" 
+      });
     }
-    const newReview = new Review({ user, comment });
+
+    const newReview = new Review({ user, comment, rating });
     await newReview.save();
-    res.status(201).json(newReview);
+
+    res.status(201).json({
+      success: true,
+      data: newReview
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error saving review" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Server Error: Could not save your review" 
+    });
   }
 });
 
