@@ -27,7 +27,7 @@ Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in act
 
 1. **Clone repo:**
    ```bash
-   git clone [https://github.com/your-username/ramtek-bazar.git](https://github.com/your-username/ramtek-bazar.git)
+   git clone [https://github.com/Utkarshende/ramtek-mini-e-shop.git](https://github.com/Utkarshende/ramtek-mini-e-shop.git)
 
 2. **Install backend deps:**
    ```bash
