@@ -10,12 +10,10 @@ function Home() {
 
   const categories = ["All", "Electronics", "Vehicles", "Furniture", "Real Estate", "Books"];
 
-  // Fetch products whenever category or search changes (Server-side filtering)
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // We use the backend's ability to filter to save bandwidth
         const { data } = await API.get(`/products/all?category=${selectedCategory}&search=${searchTerm}`);
         setProducts(data.data);
       } catch (err) {
@@ -25,7 +23,6 @@ function Home() {
       }
     };
 
-    // Debounce search input: wait 500ms after user stops typing to call API
     const delayDebounce = setTimeout(() => {
       fetchProducts();
     }, 500);
@@ -68,10 +65,18 @@ function Home() {
           </select>
         </div>
 
-        {/* Grid Display */}
+        {/* Loading State with Render Note */}
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-blue-500 animate-spin text-3xl">⚙️</div>
+          <div className="flex flex-col justify-center items-center h-96 text-center space-y-6">
+            <div className="text-blue-500 animate-spin text-5xl">⚙️</div>
+            
+            <div className="max-w-md bg-slate-900 border border-blue-500/30 p-6 rounded-3xl shadow-2xl">
+              <p className="text-slate-300 text-sm leading-relaxed">
+                <span className="text-blue-500 font-bold block mb-2">🚀 Waking up the server...</span>
+                Note: This may take 1-2 minutes to load data on the first visit. 
+                Our backend on Render goes to sleep after 15 minutes of inactivity.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
