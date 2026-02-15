@@ -15,19 +15,34 @@ connectDB();
 
 const app = express();
 
-// ✅ MIDDLEWARE
+// ✅ UPDATED CORS MIDDLEWARE
+const allowedOrigins = [
+  "https://ramtek-shop.netlify.app", // Production
+  "http://localhost:3000",           // Local React (Standard)
+  "http://localhost:5173"            // Local Vite (Standard)
+];
+
 app.use(cors({
-  origin: "https://ramtek-shop.netlify.app", 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-app.use(express.json());  // MUST come before routes
+app.use(express.json()); 
 
 // ✅ HEALTH CHECK
 app.get('/', (req, res) => {
-  res.send('🚀 Ramtek Bazar API is running smoothly at https://ramtek-bazar-backend.onrender.com');
+  res.send('🚀 Ramtek Bazar API is running smoothly');
 });
 
 // ✅ ROUTES
@@ -50,5 +65,4 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🔗 Live URL: https://ramtek-bazar-backend.onrender.com`);
 });
