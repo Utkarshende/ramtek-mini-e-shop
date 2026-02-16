@@ -6,69 +6,10 @@ import authMiddleware from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 /* ---------------------------
-   GET ALL PRODUCTS
-----------------------------*/
-router.get('/all', async (req, res) => {
-  try {
-    const products = await Product.find()
-      .populate('seller', 'name email')
-      .sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      data: products
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-/* ---------------------------
-   CREATE PRODUCT (PROTECTED)
-----------------------------*/
-router.post(
-  '/create',
-  authMiddleware,
-  upload.array('images', 5),
-  async (req, res) => {
-    try {
-
-      const { title, price, category, description, location, phoneNumber } = req.body;
-
-      const imageUrls = req.files?.map(file => file.path) || [];
-
-      const newProduct = new Product({
-        title,
-        price,
-        category,
-        description,
-        location,
-        phoneNumber,
-        images: imageUrls,
-        seller: req.user._id  // 🔥 correct
-      });
-
-      await newProduct.save();
-
-      res.status(201).json({
-        success: true,
-        data: newProduct
-      });
-
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-);
-
-/* ---------------------------
-   GET MY PRODUCTS
+   GET MY ITEMS (PROTECTED)
 ----------------------------*/
 router.get('/my-items', authMiddleware, async (req, res) => {
   try {
-
     const products = await Product.find({ seller: req.user._id })
       .sort({ createdAt: -1 });
 
@@ -78,9 +19,29 @@ router.get('/my-items', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
+    console.error("MY ITEMS ERROR:", error); // 👈 IMPORTANT
     res.status(500).json({ message: error.message });
   }
 });
+
+
+/* ---------------------------
+   GET ALL PRODUCTS
+----------------------------*/
+router.get('/all', async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate('seller', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: products });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 /* ---------------------------
    GET SINGLE PRODUCT
 ----------------------------*/
