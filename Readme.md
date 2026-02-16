@@ -48,7 +48,7 @@ Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in act
 
 - Start client (from `frontend/`):
   ```bash
-  npm run dev
+  npm start
   ```
 
 ## Contact
