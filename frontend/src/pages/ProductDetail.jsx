@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API from '../api.js';
-import StarRating from '../components/StarRating';
 
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userRating, setUserRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState([]);
 
@@ -16,28 +14,14 @@ function ProductDetails() {
     const fetchAllData = async () => {
       setLoading(true);
       try {
-        // Fetch main product
         const { data } = await API.get(`/products/${id}`);
         const currentProduct = data.data;
 
         setProduct(currentProduct);
+        setMainImg(currentProduct.images[0]);
 
-        // Safe image fallback
-        if (currentProduct.images && currentProduct.images.length > 0) {
-          setMainImg(currentProduct.images[0]);
-        } else {
-          setMainImg("");
-        }
-
-        // Fetch related
-        const relatedRes = await API.get(
-          `/products/all?category=${currentProduct.category}`
-        );
-
-        const filtered = relatedRes.data.data.filter(
-          (item) => item._id !== id
-        );
-
+        const relatedRes = await API.get(`/products/all?category=${currentProduct.category}`);
+        const filtered = relatedRes.data.data.filter(item => item._id !== id);
         setRelated(filtered.slice(0, 4));
 
       } catch (err) {
@@ -50,6 +34,13 @@ function ProductDetails() {
     fetchAllData();
     window.scrollTo(0, 0);
   }, [id]);
+
+  const handleContact = () => {
+    const message = `Hi, I saw your listing for "${product.title}" on Ramtek Bazar. Is it still available?`;
+    const phone = product.phoneNumber || product.seller?.phone || "91XXXXXXXXXX";
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -70,51 +61,6 @@ function ProductDetails() {
     }
   };
 
-  const handleContact = () => {
-    const message = `Hi, I saw your listing for "${product.title}" on Ramtek Bazar. Is it still available?`;
-
-    const phone =
-      product.phoneNumber ||
-      product.seller?.phoneNumber ||
-      "91XXXXXXXXXX";
-
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(
-      message
-    )}`;
-
-    window.open(whatsappUrl, "_blank");
-  };
-
-  const submitRating = async () => {
-    if (!product?.seller?._id) {
-      alert("Seller information is missing.");
-      return;
-    }
-
-    if (userRating === 0) {
-      alert("Please select a star rating first.");
-      return;
-    }
-
-    try {
-      await API.post(`/users/${product.seller._id}/rate`, {
-        rating: userRating,
-      });
-
-      alert("Thanks for rating!");
-
-      // Refresh product to show updated rating
-      const { data } = await API.get(`/products/${id}`);
-      setProduct(data.data);
-
-      setUserRating(0);
-
-    } catch (err) {
-      console.error("Rating Error:", err.response?.data || err.message);
-      alert("Could not submit rating.");
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -125,52 +71,39 @@ function ProductDetails() {
     );
   }
 
-  if (!product) {
-    return (
-      <div className="text-white p-10 text-center">
-        Product not found.
-      </div>
-    );
-  }
+  if (!product) return <div className="text-white p-10 text-center">Product not found.</div>;
 
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900 p-6 md:p-10 rounded-3xl border border-slate-800 h-fit">
 
-        {/* Left Section */}
+        {/* Left Image Section */}
         <div className="space-y-4">
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 group aspect-square">
-            {mainImg && (
-              <img
-                src={mainImg}
-                alt={product.title}
-                onClick={() => setIsModalOpen(true)}
-                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-150 cursor-zoom-in"
-              />
-            )}
+            <img
+              src={mainImg}
+              alt={product.title}
+              onClick={() => setIsModalOpen(true)}
+              className="w-full h-full object-cover cursor-zoom-in"
+            />
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {product.images?.map((img, idx) => (
               <img
                 key={idx}
                 src={img}
                 onClick={() => setMainImg(img)}
-                className={`w-20 h-20 object-cover rounded-xl cursor-pointer border-2 transition-all shrink-0 ${
-                  mainImg === img
-                    ? "border-blue-500 scale-95"
-                    : "border-transparent opacity-50 hover:opacity-100"
-                }`}
-                alt=""
+                className={`w-20 h-20 object-cover rounded-xl cursor-pointer border-2 ${mainImg === img ? 'border-blue-500' : 'border-transparent opacity-50 hover:opacity-100'}`}
               />
             ))}
           </div>
         </div>
 
-        {/* Right Section */}
+        {/* Right Info Section */}
         <div className="flex flex-col justify-between">
           <div>
-            <span className="text-blue-500 font-bold tracking-widest uppercase text-xs px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">
+            <span className="text-blue-500 font-bold uppercase text-xs px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">
               {product.category}
             </span>
 
@@ -179,74 +112,36 @@ function ProductDetails() {
             </h1>
 
             <p className="text-3xl text-white font-light">
-              ₹{product.price.toLocaleString("en-IN")}
+              ₹{product.price.toLocaleString('en-IN')}
             </p>
 
             <div className="border-t border-slate-800 mt-6 pt-6 space-y-4">
-              <h4 className="text-slate-500 text-xs uppercase tracking-widest">
-                Description
-              </h4>
-
-              <p className="text-slate-300 leading-relaxed">
-                {product.description}
-              </p>
-
+              <h4 className="text-slate-500 text-xs uppercase">Description</h4>
+              <p className="text-slate-300">{product.description}</p>
               <p className="text-slate-400 text-sm">
-                📍 Location:{" "}
-                <span className="text-slate-200">
-                  {product.location}
-                </span>
+                📍 Location: <span className="text-slate-200">{product.location}</span>
               </p>
             </div>
           </div>
 
           {/* Seller Box */}
-          <div className="mt-8 space-y-6">
-            <div className="p-5 bg-slate-950/50 border border-slate-800 rounded-2xl">
-              <p className="text-slate-500 text-[10px] uppercase tracking-widest mb-3">
-                Seller:{" "}
-                <span className="text-slate-200">
-                  {product.seller?.name || "Unknown"}
-                </span>
-              </p>
+          <div className="mt-8 p-5 bg-slate-950/50 border border-slate-800 rounded-2xl">
+            <p className="text-slate-500 text-xs uppercase mb-2">Seller</p>
+            <h3 className="text-white text-lg font-semibold">
+              {product.seller?.name || "Unknown Seller"}
+            </h3>
 
-              <div className="flex items-center gap-3">
-                <StarRating rating={product.seller?.rating || 0} />
-                <span className="text-white text-sm font-bold">
-                  {(product.seller?.rating || 0).toFixed(1)}
-                </span>
-                <span className="text-slate-600 text-xs">
-                  ({product.seller?.numReviews || 0} reviews)
-                </span>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-slate-900 flex items-center justify-between">
-                <StarRating
-                  rating={userRating}
-                  setRating={setUserRating}
-                  interactive
-                />
-
-                <button
-                  onClick={submitRating}
-                  className="bg-slate-900 text-blue-500 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-500 hover:text-white transition-all"
-                >
-                  Submit Rating
-                </button>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
+            <div className="flex gap-4 mt-6">
               <button
                 onClick={handleContact}
-                className="flex-[3] bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-900/20"
+                className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all"
               >
                 Chat with Seller
               </button>
 
               <button
                 onClick={handleShare}
-                className="flex-1 bg-slate-800 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white rounded-2xl transition-all flex items-center justify-center"
+                className="px-4 bg-slate-800 border border-slate-800 hover:border-blue-500 text-slate-300 hover:text-white rounded-xl transition-all"
               >
                 Share
               </button>
@@ -254,6 +149,43 @@ function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Related Items */}
+      <div className="max-w-6xl mx-auto mt-20">
+        <h2 className="text-2xl font-bold text-white mb-8">
+          More from <span className="text-blue-500">{product.category}</span>
+        </h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {related.map(item => (
+            <Link to={`/product/${item._id}`} key={item._id}>
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+                <img src={item.images[0]} className="w-full h-40 object-cover" />
+                <div className="p-4">
+                  <h3 className="text-white text-sm font-semibold truncate">
+                    {item.title}
+                  </h3>
+                  <p className="text-blue-500 font-bold mt-1">₹{item.price}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/95 flex items-center justify-center"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <img
+            src={mainImg}
+            className="max-w-full max-h-full rounded-lg"
+            alt="Full view"
+          />
+        </div>
+      )}
     </div>
   );
 }
