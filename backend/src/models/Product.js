@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const productSchema = new mongoose.Schema({
   title: { 
     type: String, 
-    required: [true, "Please enter product title"] 
+    required: true 
   },
 
   description: { 
@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema({
 
   location: { 
     type: String, 
-    default: 'Ramtek, Nagpur' 
+    default: 'Ramtek, Nagpur'
   },
 
   images: [{ 
@@ -36,7 +36,6 @@ const productSchema = new mongoose.Schema({
     required: true 
   },
 
-  // 🔥 VERY IMPORTANT
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
