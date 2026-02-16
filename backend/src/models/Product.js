@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+console.log("🔥 PRODUCT MODEL UPDATED - NO SELLER FIELD");
+
 // Define the structure of a Product post
 const productSchema = new mongoose.Schema({
   title: { 
@@ -25,12 +27,6 @@ const productSchema = new mongoose.Schema({
   images: [{ 
     type: String // We will store URLs from Cloudinary here
   }],
-  seller: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', // Links the product to a specific User
-    required: true
-  
-  },
 phoneNumber:
  { type: String,
    required: true },

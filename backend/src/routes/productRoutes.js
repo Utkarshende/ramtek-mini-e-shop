@@ -4,12 +4,14 @@ import upload from '../config/cloudinary.js';
 
 const router = express.Router();
 
-// ✅ TEST ROUTE
+
+// ================= TEST ROUTE =================
 router.get('/test', (req, res) => {
   res.send("Products route working ✅");
 });
 
-// ✅ GET ALL PRODUCTS
+
+// ================= GET ALL PRODUCTS =================
 router.get('/all', async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -25,21 +27,26 @@ router.get('/all', async (req, res) => {
 
     const products = await Product.find(query).sort({ createdAt: -1 });
 
-    res.json({
+    res.status(200).json({
       success: true,
       count: products.length,
       data: products
     });
 
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching products" });
+    console.error("Get Products Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 });
 
-// ✅ CREATE PRODUCT
+
+// ================= CREATE PRODUCT =================
 router.post('/create', upload.array('images', 5), async (req, res) => {
   try {
-    const { title, price, category, description, location, phoneNumber, seller } = req.body;
+    const { title, price, category, description, location, phoneNumber } = req.body;
 
     const imageUrls = req.files?.map(file => file.path) || [];
 
@@ -50,8 +57,7 @@ router.post('/create', upload.array('images', 5), async (req, res) => {
       description,
       location,
       phoneNumber,
-      images: imageUrls,
-      seller
+      images: imageUrls
     });
 
     await newProduct.save();
@@ -71,7 +77,8 @@ router.post('/create', upload.array('images', 5), async (req, res) => {
   }
 });
 
-// ✅ GET SINGLE PRODUCT (ALWAYS KEEP LAST)
+
+// ================= GET SINGLE PRODUCT =================
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -83,9 +90,13 @@ router.get('/:id', async (req, res) => {
       });
     }
 
-    res.json({ success: true, data: product });
+    res.status(200).json({
+      success: true,
+      data: product
+    });
 
   } catch (error) {
+    console.error("Get Single Product Error:", error);
     res.status(500).json({
       success: false,
       message: "Invalid Product ID"
