@@ -41,7 +41,6 @@ router.get('/all', async (req, res) => {
 ----------------------------*/
 router.post(
   '/create',
-  authMiddleware,
   upload.array('images', 5),
   async (req, res) => {
     try {
