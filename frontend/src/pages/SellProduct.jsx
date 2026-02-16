@@ -14,7 +14,9 @@ function SellProduct() {
     category: 'Electronics', 
     description: '', 
     location: '', 
-    phoneNumber: ''
+    phoneNumber: '',
+      seller: localStorage.getItem("userId")  // 👈 ADD THIS
+
   });
 
   const handleImageChange = (e) => {
