@@ -42,6 +42,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
