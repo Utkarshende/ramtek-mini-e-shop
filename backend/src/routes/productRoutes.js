@@ -47,7 +47,7 @@ router.post(
         location,
         phoneNumber,
         images: imageUrls,
-        seller: req.user._id  // 🔥 important
+        seller: req.user._id  // 🔥 correct
       });
 
       await newProduct.save();
@@ -63,7 +63,24 @@ router.post(
   }
 );
 
+/* ---------------------------
+   GET MY PRODUCTS
+----------------------------*/
+router.get('/my-items', authMiddleware, async (req, res) => {
+  try {
 
+    const products = await Product.find({ seller: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: products
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 /* ---------------------------
    GET SINGLE PRODUCT
 ----------------------------*/

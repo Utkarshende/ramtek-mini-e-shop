@@ -48,4 +48,32 @@ export const createProduct = async (req, res) => {
     });
   }
 };
-s
+
+import Product from "../models/Product.js";
+
+// GET SINGLE PRODUCT
+export const getSingleProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+      .populate("seller", "name email"); // 👈 VERY IMPORTANT
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product
+    });
+
+  } catch (error) {
+    console.error("Get Product Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

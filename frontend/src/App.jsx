@@ -9,6 +9,8 @@ import SellProduct from './pages/SellProduct.jsx';
 import Footer from './components/Footer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import MyListings from './pages/MyListings.jsx';
+import SellerProfile from './pages/SellerProfile';
+
 
 function App() {
   return (
@@ -23,7 +25,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
-            
+            <Route path="/seller/:id" element={<SellerProfile />} />
             <Route path="/sell" element={<ProtectedRoute><SellProduct /></ProtectedRoute>} />
             <Route 
   path="/my-listings" 

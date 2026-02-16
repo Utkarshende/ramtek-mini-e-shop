@@ -6,18 +6,25 @@ function MyListings() {
   const [myProducts, setMyProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchMyProducts = async () => {
-    try {
-      // FIX: Changed endpoint to match your backend route (/user/me)
-      const { data } = await API.get('/products/user/me');
-      setMyProducts(data.data);
-    } catch (err) {
-      console.error("Error fetching your items", err);
-      // Optional: if 401, redirect to login
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchMyProducts = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const { data } = await API.get('/products/my-items', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    setMyProducts(data.data);
+
+  } catch (err) {
+    console.error("Error fetching your items", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchMyProducts();

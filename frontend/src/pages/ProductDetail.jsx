@@ -60,6 +60,7 @@ function ProductDetails() {
       console.error("Error sharing:", err);
     }
   };
+  
 
   if (loading) {
     return (
@@ -128,7 +129,8 @@ function ProductDetails() {
           <div className="mt-8 p-5 bg-slate-950/50 border border-slate-800 rounded-2xl">
             <p className="text-slate-500 text-xs uppercase mb-2">Seller</p>
             <h3 className="text-white text-lg font-semibold">
-              {product.seller?.name || "Unknown Seller"}
+              {product.seller?.name }
+              
             </h3>
 
             <div className="flex gap-4 mt-6">
