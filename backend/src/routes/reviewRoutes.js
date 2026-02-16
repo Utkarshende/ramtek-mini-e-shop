@@ -3,13 +3,10 @@ import Review from '../models/Review.js';
 
 const router = express.Router();
 
-// @desc    GET all reviews
-// @route   GET /api/reviews
 router.get('/', async (req, res) => {
   try {
     const reviews = await Review.find().sort({ createdAt: -1 });
     
-    // Wrapping in an object makes it easier to expand later (e.g., adding pagination)
     res.status(200).json({
       success: true,
       count: reviews.length,
@@ -24,8 +21,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// @desc    POST a new review
-// @route   POST /api/reviews
+
 router.post('/', async (req, res) => {
   try {
     const { user, comment, rating } = req.body; // Added rating in case you want it later
