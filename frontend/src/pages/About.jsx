@@ -52,16 +52,21 @@ function About() {
   };
 
 const handleDelete = async (id) => {
-    if (!window.confirm("Delete this review?")) return;
-    try {
-      // Changed from /review to /reviews to match your fetch/post routes
-      await API.delete(`/reviews/${id}`); 
-      fetchReviews();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete review. Ensure the backend route exists.");
-    }
-  };
+  if (!window.confirm("Delete this review?")) return;
+  
+  // Get token from storage
+  const token = localStorage.getItem('token'); 
+
+  try {
+    await API.delete(`/reviews/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    fetchReviews();
+  } catch (err) {
+    console.error(err);
+    alert("Delete failed. Are you logged in?");
+  }
+};
 
   const handleEdit = (review) => {
     setEditingId(review._id);
