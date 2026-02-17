@@ -5,22 +5,23 @@ function About() {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [editingId, setEditingId] = useState(null);
+
   // Safe parsing of user from localStorage
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
   const fetchReviews = async () => {
     try {
       const response = await API.get('/reviews');
-      // response.data is the Axios object, response.data.data is our array from backend
+      // response.data.data is the array from backend
       setReviews(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch reviews", err);
     }
   };
 
-  useEffect(() => { 
-    fetchReviews(); 
+  useEffect(() => {
+    fetchReviews();
   }, []);
 
   const postReview = async (e) => {
@@ -30,17 +31,41 @@ function About() {
 
     setIsLoading(true);
     try {
-      await API.post('/reviews', { 
-        user: user.name, 
-        comment: newReview 
-      });
+      if (editingId) {
+        // Handle Update
+        await API.put(`/reviews/${editingId}`, { comment: newReview });
+        setEditingId(null);
+      } else {
+        // Handle New Post
+        await API.post('/reviews', { 
+          user: user.name, 
+          comment: newReview 
+        });
+      }
       setNewReview("");
-      fetchReviews(); // Refresh list after posting
+      fetchReviews(); 
     } catch (err) {
-      alert("Failed to post review. Please try again.");
+      alert("Action failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+const handleDelete = async (id) => {
+    if (!window.confirm("Delete this review?")) return;
+    try {
+      // Changed from /review to /reviews to match your fetch/post routes
+      await API.delete(`/reviews/${id}`); 
+      fetchReviews();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete review. Ensure the backend route exists.");
+    }
+  };
+
+  const handleEdit = (review) => {
+    setEditingId(review._id);
+    setNewReview(review.comment);
   };
 
   return (
@@ -62,10 +87,29 @@ function About() {
           
           <div className="space-y-4 mb-8 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
             {reviews.length > 0 ? (
-              reviews.map((r, i) => (
-                <div key={i} className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800/50">
-                  <p className="text-blue-400 text-xs font-black uppercase tracking-widest mb-1">{r.user}</p>
-                  <p className="text-slate-300 text-sm italic">"{r.comment}"</p>
+              reviews.map((review) => (
+                <div key={review._id} className="bg-slate-800 p-4 rounded-xl mb-4 border border-slate-700">
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold text-blue-400">{review.user?.name || "Anonymous"}</p>
+
+                    {user && user._id === review.user?._id && (
+                      <div className="flex gap-3 text-sm">
+                        <button
+                          onClick={() => handleEdit(review)}
+                          className="text-yellow-400 hover:text-yellow-300 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(review._id)}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-slate-300 mt-2">{review.comment}</p>
                 </div>
               ))
             ) : (
@@ -75,21 +119,23 @@ function About() {
 
           <form onSubmit={postReview} className="flex flex-col sm:flex-row gap-3">
             <input 
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all"
-              placeholder={user ? "Write your experience..." : "Login to post a review"}
+              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all text-white"
+              placeholder={user ? (editingId ? "Edit your review..." : "Write your experience...") : "Login to post a review"}
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
               disabled={!user || isLoading}
             />
             <button 
+              type="submit"
               disabled={!user || isLoading}
               className={`px-8 py-3 rounded-xl font-bold transition-all ${
                 user ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
-              {isLoading ? "Posting..." : "Post"}
+              {isLoading ? "Processing..." : (editingId ? "Update" : "Post")}
             </button>
           </form>
+
           {!user && (
             <p className="text-xs text-slate-500 mt-3 text-center sm:text-left">
               🔒 You must be logged in to share feedback.

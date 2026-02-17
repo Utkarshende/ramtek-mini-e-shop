@@ -1,28 +1,30 @@
 import express from 'express';
 import User from '../models/User.js';
+import Product from '../models/Product.js';
 
 const router = express.Router();
+
+/* ================================
+   GET SELLER PROFILE
+================================ */
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate('seller', 'name email');
+    const seller = await User.findById(req.params.id).select('-password');
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found"
-      });
-    }
+    if (!seller)
+      return res.status(404).json({ message: "Seller not found" });
 
-    res.json({ success: true, data: product });
+    const products = await Product.find({ seller: seller._id })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      seller,
+      products
+    });
 
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 });
-
 
 export default router;

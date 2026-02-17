@@ -1,50 +1,78 @@
 import express from 'express';
 import Review from '../models/Review.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+/* ================================
+   CREATE REVIEW
+================================ */
+router.post('/:productId', authMiddleware, async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 });
-    
-    res.status(200).json({
-      success: true,
-      count: reviews.length,
-      data: reviews
+    const { rating, comment } = req.body;
+
+    const review = new Review({
+      product: req.params.productId,
+      user: req.user._id,
+      rating,
+      comment
     });
-  } catch (err) {
-    console.error("Review Fetch Error:", err);
-    res.status(500).json({ 
-      success: false, 
-      message: "Error fetching reviews from database" 
-    });
+
+    await review.save();
+
+    const populatedReview = await review.populate('user', 'name');
+
+    res.status(201).json({ success: true, data: populatedReview });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
-
-router.post('/', async (req, res) => {
+/* ================================
+   UPDATE REVIEW
+================================ */
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const { user, comment, rating } = req.body; // Added rating in case you want it later
-    
-    if (!user || !comment) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please provide both a name and a comment" 
-      });
-    }
+    const review = await Review.findById(req.params.id);
 
-    const newReview = new Review({ user, comment, rating });
-    await newReview.save();
+    if (!review)
+      return res.status(404).json({ message: "Review not found" });
 
-    res.status(201).json({
-      success: true,
-      data: newReview
-    });
-  } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Server Error: Could not save your review" 
-    });
+    if (review.user.toString() !== req.user._id.toString())
+      return res.status(403).json({ message: "Not authorized" });
+
+    review.rating = req.body.rating || review.rating;
+    review.comment = req.body.comment || review.comment;
+
+    await review.save();
+
+    res.json({ success: true, data: review });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/* ================================
+   DELETE REVIEW
+================================ */
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+
+    if (!review)
+      return res.status(404).json({ message: "Review not found" });
+
+    if (review.user.toString() !== req.user._id.toString())
+      return res.status(403).json({ message: "Not authorized" });
+
+    await review.deleteOne();
+
+    res.json({ message: "Review deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

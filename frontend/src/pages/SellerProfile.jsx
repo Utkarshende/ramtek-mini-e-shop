@@ -33,7 +33,6 @@ function SellerProfile() {
     <div className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="max-w-6xl mx-auto">
 
-        {/* Seller Info */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-12">
           <h1 className="text-3xl font-bold">{seller.name}</h1>
           <p className="text-slate-400 mt-2">{seller.email}</p>
@@ -42,8 +41,9 @@ function SellerProfile() {
           </p>
         </div>
 
-        {/* Seller Products */}
-        <h2 className="text-2xl font-bold mb-6">Listings by {seller.name}</h2>
+        <h2 className="text-2xl font-bold mb-6">
+          Listings by {seller.name}
+        </h2>
 
         {products.length === 0 ? (
           <p className="text-slate-500">No products posted yet.</p>
@@ -53,7 +53,7 @@ function SellerProfile() {
               <Link to={`/product/${item._id}`} key={item._id}>
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-blue-500 transition-all">
                   <img
-                    src={item.images[0]}
+                    src={item.images?.[0]}
                     alt={item.title}
                     className="w-full h-40 object-cover"
                   />

@@ -42,6 +42,21 @@ function ProductDetails() {
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleDelete = async (id) => {
+  try {
+    await API.delete(`/reviews/${id}`);
+    setReviews(reviews.filter(r => r._id !== id));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleEdit = (review) => {
+  setEditReview(review);
+  setComment(review.comment);
+};
+
+
   const handleShare = async () => {
     const shareData = {
       title: product.title,
@@ -127,11 +142,15 @@ function ProductDetails() {
 
           {/* Seller Box */}
           <div className="mt-8 p-5 bg-slate-950/50 border border-slate-800 rounded-2xl">
-            <p className="text-slate-500 text-xs uppercase mb-2">Seller</p>
-            <h3 className="text-white text-lg font-semibold">
-              {product.seller?.name }
-              
-            </h3>
+<p className="text-slate-400 mt-2">
+  Sold by{" "}
+  <Link 
+    to={`/seller/${product.seller._id}`}
+    className="text-blue-500 hover:underline"
+  >
+    {product.seller.name}
+  </Link>
+</p>            
 
             <div className="flex gap-4 mt-6">
               <button

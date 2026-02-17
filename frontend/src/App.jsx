@@ -14,27 +14,26 @@ import SellerProfile from './pages/SellerProfile';
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen">
+   <div className="flex flex-col min-h-screen">
       <Router>
         <Navbar />
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/about" element={<About />} /> {/* Keep only one */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/about" element={<About />} />
             <Route path="/seller/:id" element={<SellerProfile />} />
             <Route path="/sell" element={<ProtectedRoute><SellProduct /></ProtectedRoute>} />
             <Route 
-  path="/my-listings" 
-  element={
-    <ProtectedRoute>
-      <MyListings />
-    </ProtectedRoute>
-  } 
-/>
+              path="/my-listings" 
+              element={
+                <ProtectedRoute>
+                  <MyListings />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
         <Footer />
