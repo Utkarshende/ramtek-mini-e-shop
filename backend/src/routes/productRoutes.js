@@ -77,7 +77,21 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
 router.get('/all', async (req, res) => {
   try {
-    const products = await Product.find()
+    const { category, search } = req.query;
+
+    let filter = {};
+
+    // Category filter
+    if (category && category !== "All") {
+      filter.category = category;
+    }
+
+    // Search filter
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+
+    const products = await Product.find(filter)
       .populate('seller', 'name email')
       .sort({ createdAt: -1 });
 
@@ -87,6 +101,7 @@ router.get('/all', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 
 router.get('/:id', async (req, res) => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api.js';
 import { Link } from 'react-router-dom';
+import { CATEGORIES } from '../config/constants.js';
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -8,7 +9,7 @@ function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
-  const categories = ["All", "Electronics", "Vehicles", "Furniture", "Real Estate", "Books"];
+  //const categories = ["All","Electronics", "Vehicles", "Furniture", "Real Estate", "Books","Other"];//
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -59,7 +60,7 @@ function Home() {
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {categories.map(cat => (
+            {CATEGORIES.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>

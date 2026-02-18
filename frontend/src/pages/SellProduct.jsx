@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../api.js';
+import { CATEGORIES } from '../config/constants.js';
 
 function SellProduct() {
   const navigate = useNavigate();
@@ -108,17 +109,26 @@ function SellProduct() {
               onChange={(e) => setFormData({...formData, price: e.target.value})} required />
           </div>
           
-          <div className="space-y-2">
-            <label className="text-xs text-slate-500 uppercase font-bold ml-1">Category</label>
-            <select className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none transition-all"
-              onChange={(e) => setFormData({...formData, category: e.target.value})}>
-              <option value="Electronics">Electronics</option>
-              <option value="Vehicles">Vehicles</option>
-              <option value="Furniture">Furniture</option>
-              <option value="Real Estate">Real Estate</option>
-              <option value="Services">Services</option>
-            </select>
-          </div>
+       <div className="space-y-2">
+  <label className="text-xs text-slate-500 uppercase font-bold ml-1">
+    Category
+  </label>
+
+  <select
+    value={formData.category}
+    onChange={(e) =>
+      setFormData({ ...formData, category: e.target.value })
+    }
+    className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none transition-all"
+  >
+    {CATEGORIES.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat}
+      </option>
+    ))}
+  </select>
+</div>
+
 
           <div className="space-y-2">
             <label className="text-xs text-slate-500 uppercase font-bold ml-1">Location</label>
