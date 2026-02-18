@@ -10,11 +10,11 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState([]);
   
-  // --- NEW STATE FOR INLINE EDITING ---
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Get user safely
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
   useEffect(() => {
@@ -25,9 +25,10 @@ function ProductDetails() {
         const currentProduct = data.data;
 
         setProduct(currentProduct);
-        setEditData(currentProduct); // Initialize edit form with product data
+        setEditData(currentProduct); 
         setMainImg(currentProduct.images[0]);
 
+        // Fetch related products
         const relatedRes = await API.get(`/products/all?category=${currentProduct.category}`);
         const filtered = relatedRes.data.data.filter(item => item._id !== id);
         setRelated(filtered.slice(0, 4));
@@ -43,7 +44,6 @@ function ProductDetails() {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // --- NEW UPDATE HANDLER ---
   const handleInlineUpdate = async () => {
     setIsUpdating(true);
     try {
@@ -71,7 +71,6 @@ function ProductDetails() {
       text: `Check out this ${product.title} on Ramtek Bazar!`,
       url: window.location.href,
     };
-
     try {
       if (navigator.share) {
         await navigator.share(shareData);
@@ -93,6 +92,10 @@ function ProductDetails() {
   }
 
   if (!product) return <div className="text-white p-10 text-center">Product not found.</div>;
+
+  // --- CRITICAL FIX: STRING COMPARISON FOR IDs ---
+  const isOwner = user && product.seller && 
+    String(user._id) === String(product.seller._id || product.seller);
 
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-10">
@@ -127,7 +130,6 @@ function ProductDetails() {
               {product.category}
             </span>
 
-            {/* --- INLINE EDIT TITLE --- */}
             {isEditing ? (
               <input 
                 className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold outline-none"
@@ -138,7 +140,6 @@ function ProductDetails() {
               <h1 className="text-4xl font-bold text-white mt-4 mb-2">{product.title}</h1>
             )}
 
-            {/* --- INLINE EDIT PRICE --- */}
             <div className="flex items-center gap-2 mt-2">
               <span className="text-3xl text-white font-light">₹</span>
               {isEditing ? (
@@ -149,14 +150,12 @@ function ProductDetails() {
                   onChange={(e) => setEditData({...editData, price: e.target.value})}
                 />
               ) : (
-                <p className="text-3xl text-white font-light">{product.price.toLocaleString('en-IN')}</p>
+                <p className="text-3xl text-white font-light">{product.price?.toLocaleString('en-IN')}</p>
               )}
             </div>
 
             <div className="border-t border-slate-800 mt-6 pt-6 space-y-4">
               <h4 className="text-slate-500 text-xs uppercase">Description</h4>
-              
-              {/* --- INLINE EDIT DESCRIPTION --- */}
               {isEditing ? (
                 <textarea 
                   className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-slate-300 outline-none h-32"
@@ -166,7 +165,6 @@ function ProductDetails() {
               ) : (
                 <p className="text-slate-300 whitespace-pre-wrap">{product.description}</p>
               )}
-
               <p className="text-slate-400 text-sm">
                 📍 Location: <span className="text-slate-200">{product.location || "Ramtek"}</span>
               </p>
@@ -178,13 +176,13 @@ function ProductDetails() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <p className="text-slate-500 text-xs uppercase mb-1">Seller Information</p>
-                <Link to={`/seller/${product.seller?._id}`} className="text-blue-400 text-lg font-bold hover:underline">
+                <Link to={`/seller/${product.seller?._id || product.seller}`} className="text-blue-400 text-lg font-bold hover:underline">
                   {product.seller?.name || "Verified Seller"}
                 </Link>
               </div>
               
-              {/* --- INLINE EDIT TOGGLE BUTTONS --- */}
-              {user && product.seller && user._id === product.seller._id && (
+              {/* --- CORRECTED OWNER CHECK --- */}
+              {isOwner && (
                 <div className="flex gap-2">
                   {isEditing ? (
                     <>
@@ -215,16 +213,10 @@ function ProductDetails() {
             </div>
 
             <div className="flex gap-4">
-              <button
-                onClick={handleContact}
-                className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-900/20"
-              >
+              <button onClick={handleContact} className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-all">
                 Chat via WhatsApp
               </button>
-              <button
-                onClick={handleShare}
-                className="px-6 bg-slate-800 border border-slate-700 hover:border-blue-500 text-slate-300 hover:text-white rounded-xl transition-all"
-              >
+              <button onClick={handleShare} className="px-6 bg-slate-800 border border-slate-700 hover:border-blue-500 text-slate-300 hover:text-white rounded-xl transition-all">
                 Share
               </button>
             </div>

@@ -2,54 +2,33 @@ import Product from "../models/Product.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const {
-      title,
-      price,
-      category,
-      description,
-      location,
-      phoneNumber,
-      seller
-    } = req.body;
+    // req.user._id comes from your authMiddleware
+    const sellerId = req.user?._id || req.body.seller; 
 
-    if (!seller) {
-      return res.status(400).json({
-        success: false,
-        message: "Seller ID is required"
-      });
+    if (!sellerId) {
+      return res.status(400).json({ success: false, message: "Seller authentication failed" });
     }
 
     const imageUrls = req.files?.map(file => file.path) || [];
 
     const newProduct = new Product({
-      title,
-      price,
-      category,
-      description,
-      location,
-      phoneNumber,
+      ...req.body,
       images: imageUrls,
-      seller
+      seller: sellerId // Use the ID from the token
     });
 
     await newProduct.save();
+    // Populate seller info so the frontend receives the full object immediately
+    const populatedProduct = await newProduct.populate("seller", "name email");
 
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
-      data: newProduct
+      data: populatedProduct
     });
-
   } catch (error) {
-    console.error("Create Product Error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-
-import Product from "../models/Product.js";
 
 // GET SINGLE PRODUCT
 export const getSingleProduct = async (req, res) => {
