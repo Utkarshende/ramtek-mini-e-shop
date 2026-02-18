@@ -182,34 +182,12 @@ function ProductDetails() {
               </div>
               
               {/* --- CORRECTED OWNER CHECK --- */}
-              {isOwner && (
-                <div className="flex gap-2">
-                  {isEditing ? (
-                    <>
-                      <button 
-                        onClick={() => { setIsEditing(false); setEditData(product); }}
-                        className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700 hover:bg-slate-700 transition-all"
-                      >
-                        Cancel
-                      </button>
-                      <button 
-                        onClick={handleInlineUpdate}
-                        disabled={isUpdating}
-                        className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-500 transition-all"
-                      >
-                        {isUpdating ? "Saving..." : "Save"}
-                      </button>
-                    </>
-                  ) : (
-                    <button 
-                      onClick={() => setIsEditing(true)}
-                      className="bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black border border-yellow-500/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"
-                    >
-                      Edit Listing
-                    </button>
-                  )}
-                </div>
-              )}
+              {/* Temporary Debug Check */}
+{console.log("MATCH:", String(user?._id) === String(product.seller?._id))}
+
+{user && product.seller && String(user._id) === String(product.seller._id) && (
+   <button onClick={() => setIsEditing(true)}>Edit Listing</button>
+)}
             </div>
 
             <div className="flex gap-4">
