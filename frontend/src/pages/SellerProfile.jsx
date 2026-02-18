@@ -84,4 +84,4 @@ function SellerProfile() {
   );
 }
 
-export default SellerProfile;a
+export default SellerProfile;

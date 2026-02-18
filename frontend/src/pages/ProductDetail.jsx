@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API from '../api.js';
-import EditProductModal from '../components/EditProductModal'; // Ensure this exists
 
 function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false); // For image zoom
-  const [showEditModal, setShowEditModal] = useState(false); // For editing details
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState([]);
+  
+  // --- NEW STATE FOR INLINE EDITING ---
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Get user from localStorage
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
   useEffect(() => {
@@ -23,6 +25,7 @@ function ProductDetails() {
         const currentProduct = data.data;
 
         setProduct(currentProduct);
+        setEditData(currentProduct); // Initialize edit form with product data
         setMainImg(currentProduct.images[0]);
 
         const relatedRes = await API.get(`/products/all?category=${currentProduct.category}`);
@@ -39,6 +42,21 @@ function ProductDetails() {
     fetchAllData();
     window.scrollTo(0, 0);
   }, [id]);
+
+  // --- NEW UPDATE HANDLER ---
+  const handleInlineUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const res = await API.put(`/products/${id}`, editData);
+      setProduct(res.data.data);
+      setIsEditing(false);
+      alert("Product updated successfully!");
+    } catch (err) {
+      alert("Update failed. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleContact = () => {
     const message = `Hi, I saw your listing for "${product.title}" on Ramtek Bazar. Is it still available?`;
@@ -109,12 +127,46 @@ function ProductDetails() {
               {product.category}
             </span>
 
-            <h1 className="text-4xl font-bold text-white mt-4 mb-2">{product.title}</h1>
-            <p className="text-3xl text-white font-light">₹{product.price.toLocaleString('en-IN')}</p>
+            {/* --- INLINE EDIT TITLE --- */}
+            {isEditing ? (
+              <input 
+                className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold outline-none"
+                value={editData.title}
+                onChange={(e) => setEditData({...editData, title: e.target.value})}
+              />
+            ) : (
+              <h1 className="text-4xl font-bold text-white mt-4 mb-2">{product.title}</h1>
+            )}
+
+            {/* --- INLINE EDIT PRICE --- */}
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-3xl text-white font-light">₹</span>
+              {isEditing ? (
+                <input 
+                  type="number"
+                  className="bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 text-white text-2xl outline-none"
+                  value={editData.price}
+                  onChange={(e) => setEditData({...editData, price: e.target.value})}
+                />
+              ) : (
+                <p className="text-3xl text-white font-light">{product.price.toLocaleString('en-IN')}</p>
+              )}
+            </div>
 
             <div className="border-t border-slate-800 mt-6 pt-6 space-y-4">
               <h4 className="text-slate-500 text-xs uppercase">Description</h4>
-              <p className="text-slate-300 whitespace-pre-wrap">{product.description}</p>
+              
+              {/* --- INLINE EDIT DESCRIPTION --- */}
+              {isEditing ? (
+                <textarea 
+                  className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-slate-300 outline-none h-32"
+                  value={editData.description}
+                  onChange={(e) => setEditData({...editData, description: e.target.value})}
+                />
+              ) : (
+                <p className="text-slate-300 whitespace-pre-wrap">{product.description}</p>
+              )}
+
               <p className="text-slate-400 text-sm">
                 📍 Location: <span className="text-slate-200">{product.location || "Ramtek"}</span>
               </p>
@@ -131,14 +183,34 @@ function ProductDetails() {
                 </Link>
               </div>
               
-              {/* Only show Edit button if current user is the seller */}
+              {/* --- INLINE EDIT TOGGLE BUTTONS --- */}
               {user && product.seller && user._id === product.seller._id && (
-                <button 
-                  onClick={() => setShowEditModal(true)}
-                  className="bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black border border-yellow-500/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"
-                >
-                  Edit Listing
-                </button>
+                <div className="flex gap-2">
+                  {isEditing ? (
+                    <>
+                      <button 
+                        onClick={() => { setIsEditing(false); setEditData(product); }}
+                        className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700 hover:bg-slate-700 transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={handleInlineUpdate}
+                        disabled={isUpdating}
+                        className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-500 transition-all"
+                      >
+                        {isUpdating ? "Saving..." : "Save"}
+                      </button>
+                    </>
+                  ) : (
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black border border-yellow-500/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"
+                    >
+                      Edit Listing
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -159,15 +231,6 @@ function ProductDetails() {
           </div>
         </div>
       </div>
-
-      {/* Edit Modal Component */}
-      {showEditModal && (
-        <EditProductModal 
-          product={product} 
-          onClose={() => setShowEditModal(false)}
-          onUpdate={(updatedData) => setProduct(updatedData)}
-        />
-      )}
 
       {/* Image Zoom Modal */}
       {isModalOpen && (
