@@ -68,7 +68,6 @@ function About() {
         <h1 className="text-4xl font-bold mb-6 tracking-tight">
           About <span className="text-blue-500">Ramtek Bazar</span>
         </h1>
-       // About.jsx update
 <div className="space-y-12">
   <section>
     <h2 className="text-2xl font-bold text-blue-500 mb-4">Our Mission</h2>
@@ -94,6 +93,8 @@ function About() {
     </div>
   </section>
 </div>
+<br/>
+<br/>
 
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-left mb-16 shadow-2xl">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
@@ -163,13 +164,6 @@ function About() {
             </p>
           )}
         </div>
-      </div>
-
-      <div className="mt-20 border-t border-slate-900 pt-10 text-center">
-        <h3 className="text-slate-500 uppercase tracking-[0.3em] text-[10px] font-bold mb-4">Get in touch</h3>
-        <p className="text-slate-300 hover:text-blue-500 transition-colors cursor-pointer font-medium">
-          support@ramtekbazar.com
-        </p>
       </div>
     </div>
   );

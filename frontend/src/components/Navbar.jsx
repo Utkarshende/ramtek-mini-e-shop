@@ -29,6 +29,7 @@ function Navbar() {
           <NavLink to="/sell" className={linkStyle}>Sell</NavLink>
           {user && (
   <NavLink to="/my-listings" className={linkStyle}>My Items</NavLink>
+  
 )}
         </div>
       </div>
