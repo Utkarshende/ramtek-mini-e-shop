@@ -27,4 +27,15 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Get Seller Profile & their Products
+router.get('/seller/:id', async (req, res) => {
+  try {
+    const seller = await User.findById(req.params.id).select('-password');
+    const products = await Product.find({ seller: req.params.id });
+    res.json({ success: true, seller, products });
+  } catch (error) {
+    res.status(500).json({ message: "Seller not found" });
+  }
+});
+
 export default router;

@@ -142,15 +142,20 @@ const handleEdit = (review) => {
 
           {/* Seller Box */}
           <div className="mt-8 p-5 bg-slate-950/50 border border-slate-800 rounded-2xl">
-<p className="text-slate-400 mt-2">
-  Sold by{" "}
-  <Link 
-    to={`/seller/${product.seller._id}`}
-    className="text-blue-500 hover:underline"
+// Inside ProductDetail.jsx
+{user && user._id === product.seller._id && (
+  <button 
+    onClick={() => setShowEditModal(true)}
+    className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-full font-bold transition-all"
   >
-    {product.seller.name}
-  </Link>
-</p>            
+    Edit Product
+  </button>
+)}
+
+{/* Simple link to Seller Profile */}
+<p className="mt-4">
+  Seller: <Link to={`/seller/${product.seller._id}`} className="text-blue-400 underline">{product.seller.name}</Link>
+</p>          
 
             <div className="flex gap-4 mt-6">
               <button
