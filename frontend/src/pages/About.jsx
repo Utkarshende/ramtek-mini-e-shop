@@ -13,8 +13,8 @@ function About() {
   const fetchReviews = async () => {
     try {
       const response = await API.get('/reviews');
-      // response.data.data is the array from backend
-      setReviews(response.data.data || []);
+      // The backend returns { data: [...] }
+      setReviews(response.data.data || []); 
     } catch (err) {
       console.error("Failed to fetch reviews", err);
     }
@@ -24,7 +24,7 @@ function About() {
     fetchReviews();
   }, []);
 
-  const postReview = async (e) => {
+const postReview = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please login to leave a review");
     if (!newReview.trim()) return;
@@ -32,20 +32,16 @@ function About() {
     setIsLoading(true);
     try {
       if (editingId) {
-        // Handle Update
         await API.put(`/reviews/${editingId}`, { comment: newReview });
         setEditingId(null);
       } else {
-        // Handle New Post
-        await API.post('/reviews', { 
-          user: user.name, 
-          comment: newReview 
-        });
+        // Changed: Removed 'user: user.name' because backend gets user from token
+        await API.post('/reviews', { comment: newReview }); 
       }
       setNewReview("");
       fetchReviews(); 
     } catch (err) {
-      alert("Action failed. Please try again.");
+      alert("Action failed. Check console for details.");
     } finally {
       setIsLoading(false);
     }
@@ -53,18 +49,12 @@ function About() {
 
 const handleDelete = async (id) => {
   if (!window.confirm("Delete this review?")) return;
-  
-  // Get token from storage
-  const token = localStorage.getItem('token'); 
-
   try {
-    await API.delete(`/reviews/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    // Fixed: Removed the extra '/api' prefix
+    await API.delete(`/reviews/${id}`); 
     fetchReviews();
   } catch (err) {
-    console.error(err);
-    alert("Delete failed. Are you logged in?");
+    alert("Delete failed.");
   }
 };
 
