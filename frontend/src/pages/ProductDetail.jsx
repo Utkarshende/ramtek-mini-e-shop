@@ -78,6 +78,39 @@ function ProductDetails() {
     }
   };
 
+  // ================= CONTACT =================
+const handleContact = () => {
+  if (!product?.seller?.phone) {
+    alert("Seller phone number not available.");
+    return;
+  }
+
+  const message = `Hi, I'm interested in your product: ${product.title}`;
+  window.open(
+    `https://wa.me/${product.seller.phone}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+};
+
+// ================= SHARE =================
+const handleShare = async () => {
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: product.title,
+        text: product.description,
+        url: window.location.href,
+      });
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    }
+  } catch (err) {
+    console.log("Share cancelled");
+  }
+};
+
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
