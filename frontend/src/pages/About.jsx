@@ -7,13 +7,13 @@ function About() {
   const [isLoading, setIsLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // Safe parsing of user from localStorage
+  // 1. Safe parsing of user - handles both .id and ._id formats
   const user = JSON.parse(localStorage.getItem('user')) || null;
+  const loggedInId = user?.id || user?._id;
 
   const fetchReviews = async () => {
     try {
       const response = await API.get('/reviews');
-      // The backend returns { data: [...] }
       setReviews(response.data.data || []); 
     } catch (err) {
       console.error("Failed to fetch reviews", err);
@@ -24,7 +24,7 @@ function About() {
     fetchReviews();
   }, []);
 
-const postReview = async (e) => {
+  const postReview = async (e) => {
     e.preventDefault();
     if (!user) return alert("Please login to leave a review");
     if (!newReview.trim()) return;
@@ -35,32 +35,34 @@ const postReview = async (e) => {
         await API.put(`/reviews/${editingId}`, { comment: newReview });
         setEditingId(null);
       } else {
-        // Changed: Removed 'user: user.name' because backend gets user from token
         await API.post('/reviews', { comment: newReview }); 
       }
       setNewReview("");
       fetchReviews(); 
     } catch (err) {
-      alert("Action failed. Check console for details.");
+      alert("Action failed. You might not be authorized to edit this.");
     } finally {
       setIsLoading(false);
     }
   };
 
-const handleDelete = async (id) => {
-  if (!window.confirm("Delete this review?")) return;
-  try {
-    // Fixed: Removed the extra '/api' prefix
-    await API.delete(`/reviews/${id}`); 
-    fetchReviews();
-  } catch (err) {
-    alert("Delete failed.");
-  }
-};
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this review?")) return;
+    try {
+      await API.delete(`/reviews/${id}`); 
+      fetchReviews();
+    } catch (err) {
+      // If this fails with 403, it's a backend ownership mismatch
+      alert("Delete failed: Forbidden. You can only delete your own reviews.");
+      console.error(err);
+    }
+  };
 
   const handleEdit = (review) => {
     setEditingId(review._id);
     setNewReview(review.comment);
+    // Scroll to input for better UX
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
 
   return (
@@ -82,31 +84,38 @@ const handleDelete = async (id) => {
           
           <div className="space-y-4 mb-8 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
             {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <div key={review._id} className="bg-slate-800 p-4 rounded-xl mb-4 border border-slate-700">
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold text-blue-400">{review.user?.name || "Anonymous"}</p>
+              reviews.map((review) => {
+                // 2. LOGIC FIX: Extract reviewer ID safely
+                const reviewerId = review.user?._id || review.user;
+                // 3. LOGIC FIX: Compare strings to avoid Object vs String mismatch
+                const isReviewOwner = loggedInId && reviewerId && String(loggedInId) === String(reviewerId);
 
-                    {user && user._id === review.user?._id && (
-                      <div className="flex gap-3 text-sm">
-                        <button
-                          onClick={() => handleEdit(review)}
-                          className="text-yellow-400 hover:text-yellow-300 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(review._id)}
-                          className="text-red-400 hover:text-red-300 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
+                return (
+                  <div key={review._id} className="bg-slate-800 p-4 rounded-xl mb-4 border border-slate-700 transition-all hover:border-slate-600">
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-blue-400">{review.user?.name || "Anonymous"}</p>
+
+                      {isReviewOwner && (
+                        <div className="flex gap-4 text-xs font-bold uppercase tracking-wider">
+                          <button
+                            onClick={() => handleEdit(review)}
+                            className="text-yellow-500 hover:text-yellow-400 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(review._id)}
+                            className="text-red-500 hover:text-red-400 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-slate-300 mt-2 leading-relaxed">{review.comment}</p>
                   </div>
-                  <p className="text-slate-300 mt-2">{review.comment}</p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p className="text-slate-600 text-sm italic">No reviews yet. Be the first to say something!</p>
             )}
@@ -114,7 +123,7 @@ const handleDelete = async (id) => {
 
           <form onSubmit={postReview} className="flex flex-col sm:flex-row gap-3">
             <input 
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all text-white"
+              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition-all text-white shadow-inner"
               placeholder={user ? (editingId ? "Edit your review..." : "Write your experience...") : "Login to post a review"}
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
@@ -123,8 +132,8 @@ const handleDelete = async (id) => {
             <button 
               type="submit"
               disabled={!user || isLoading}
-              className={`px-8 py-3 rounded-xl font-bold transition-all ${
-                user ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+              className={`px-8 py-3 rounded-xl font-bold transition-all transform active:scale-95 ${
+                user ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
               {isLoading ? "Processing..." : (editingId ? "Update" : "Post")}
@@ -132,8 +141,8 @@ const handleDelete = async (id) => {
           </form>
 
           {!user && (
-            <p className="text-xs text-slate-500 mt-3 text-center sm:text-left">
-              🔒 You must be logged in to share feedback.
+            <p className="text-xs text-slate-500 mt-4 text-center sm:text-left flex items-center gap-2">
+              <span>🔒</span> You must be logged in to share feedback.
             </p>
           )}
         </div>
