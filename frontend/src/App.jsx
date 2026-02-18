@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import MyListings from './pages/MyListings.jsx';
 import SellerProfile from './pages/SellerProfile';
 import Contact from './pages/Contact.jsx';
+import Privacy from './pages/Privacy.jsx';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/seller/:id" element={<SellerProfile />} />
             <Route path="/sell" element={<ProtectedRoute><SellProduct /></ProtectedRoute>} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route 
               path="/my-listings" 
               element={
