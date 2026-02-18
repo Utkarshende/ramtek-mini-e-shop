@@ -93,9 +93,8 @@ function ProductDetails() {
 
   if (!product) return <div className="text-white p-10 text-center">Product not found.</div>;
 
-  // --- CRITICAL FIX: STRING COMPARISON FOR IDs ---
-  const isOwner = user && product.seller && 
-    String(user._id) === String(product.seller._id || product.seller);
+    const isOwner = user && product.seller && 
+  String(user._id).trim().toLowerCase() === String(product.seller._id || product.seller).trim().toLowerCase();
 
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-10">
@@ -180,10 +179,10 @@ function ProductDetails() {
                   {product.seller?.name || "Verified Seller"}
                 </Link>
               </div>
-              
-              {/* --- CORRECTED OWNER CHECK --- */}
-              {/* Temporary Debug Check */}
-{console.log("MATCH:", String(user?._id) === String(product.seller?._id))}
+             
+{console.log("Logged User:", String(user?._id).trim().toLowerCase())}
+{console.log("Seller ID:", String(product.seller?._id || product.seller).trim().toLowerCase())}
+{console.log("FINAL MATCH:", isOwner)}
 
 {user && product.seller && String(user._id) === String(product.seller._id) && (
    <button onClick={() => setIsEditing(true)}>Edit Listing</button>
