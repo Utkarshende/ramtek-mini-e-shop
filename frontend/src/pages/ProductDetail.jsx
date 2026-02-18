@@ -230,6 +230,41 @@ function ProductDetails() {
               {product.seller?.name || "Seller Profile"}
             </Link>
 
+            {/* Seller Box */}
+<div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
+
+  {/* Seller Name */}
+  <div className="flex justify-between items-center mb-4">
+    <div>
+      <p className="text-slate-500 text-xs uppercase mb-1">
+        Seller Information
+      </p>
+
+      <Link to={`/seller/${sellerId}`}>
+        {product.seller?.name}
+      </Link>
+    </div>
+
+    {/* ONLY owner sees edit */}
+    {isOwner && (
+      <button>Edit Listing</button>
+    )}
+  </div>
+
+  {/* EVERYONE sees chat & share */}
+  <div className="flex gap-4">
+    <button onClick={handleContact}>
+      Chat via WhatsApp
+    </button>
+
+    <button onClick={handleShare}>
+      Share
+    </button>
+  </div>
+
+</div>
+
+
             {isOwner && (
               <div className="flex gap-3 mt-4">
                 {isEditing ? (

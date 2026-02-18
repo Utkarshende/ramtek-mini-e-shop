@@ -149,6 +149,9 @@ function SellProduct() {
             onChange={(e) => setFormData({...formData, description: e.target.value})} required />
         </div>
 
+
+
+
         <button 
           disabled={isUploading}
           className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl transition-all active:scale-[0.98] ${isUploading ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white hover:shadow-blue-500/20'}`}
