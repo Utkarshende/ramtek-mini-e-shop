@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Product from '../models/Product.js'; // Ensure path is correct
+import Product from '../models/Product.js'; 
 
 dotenv.config();
 
@@ -44,11 +44,9 @@ const seedDB = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB...");
     
-    // Clear existing products
     await Product.deleteMany({});
     console.log("Old data cleared.");
 
-    // Insert new products
     await Product.insertMany(fakeProducts);
     console.log("Fake data added successfully!");
     

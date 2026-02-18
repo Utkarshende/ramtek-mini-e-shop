@@ -35,7 +35,6 @@ function SellerProfile() {
     <div className="min-h-screen bg-slate-950 p-6 md:p-12">
       <div className="max-w-6xl mx-auto">
         
-        {/* Seller Header Card */}
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl mb-12 flex flex-col md:flex-row items-center gap-8">
           <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-3xl font-bold text-white">
             {seller.name.charAt(0)}
@@ -51,7 +50,6 @@ function SellerProfile() {
           </div>
         </div>
 
-        {/* Product Grid */}
         <h2 className="text-2xl font-bold text-white mb-8 border-b border-slate-800 pb-4">
           All Listings from {seller.name}
         </h2>

@@ -34,7 +34,6 @@ function MyListings() {
     if (window.confirm("Are you sure you want to delete this listing? It will be removed from Ramtek Bazar permanently.")) {
       try {
         await API.delete(`/products/${id}`);
-        // Optimistic UI update: remove from state immediately
         setMyProducts(prev => prev.filter(item => item._id !== id));
         alert("Listing removed successfully.");
       } catch (err) {
@@ -72,7 +71,6 @@ function MyListings() {
                 key={item._id} 
                 className="group flex flex-col md:flex-row items-center gap-6 bg-slate-900/50 border border-slate-800 p-5 rounded-3xl hover:bg-slate-900 hover:border-blue-500/30 transition-all duration-300"
               >
-                {/* Image with subtle hover zoom */}
                 <div className="w-full md:w-24 h-24 overflow-hidden rounded-2xl border border-slate-800">
                   <img 
                     src={item.images[0]} 

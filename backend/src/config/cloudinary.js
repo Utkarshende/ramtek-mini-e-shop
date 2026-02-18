@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Safety check to prevent .trim() crash if .env is missing
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
 const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
 const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
@@ -27,4 +26,4 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-export default upload; // Export as default
+export default upload; 

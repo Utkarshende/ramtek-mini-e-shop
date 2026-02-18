@@ -15,7 +15,6 @@ function ProductDetails() {
   const [editData, setEditData] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Get user safely from localStorage
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
   useEffect(() => {
@@ -105,7 +104,6 @@ function ProductDetails() {
 
   if (!product) return <div className="text-white p-10 text-center">Product not found.</div>;
 
-  // --- LOGIC FIX: Check for .id (LocalStorage) against ._id (Backend) ---
   const loggedInId = user?.id || user?._id;
   const sellerId = product.seller?._id || product.seller;
   const isOwner = loggedInId && sellerId && String(loggedInId) === String(sellerId);
@@ -114,7 +112,6 @@ function ProductDetails() {
     <div className="min-h-screen bg-slate-950 p-4 md:p-10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 bg-slate-900 p-6 md:p-10 rounded-3xl border border-slate-800 h-fit">
 
-        {/* Left Image Section */}
         <div className="space-y-4">
           <div className="relative overflow-hidden rounded-2xl border border-slate-800 group aspect-square bg-slate-950">
             <img
@@ -136,7 +133,6 @@ function ProductDetails() {
           </div>
         </div>
 
-        {/* Right Info Section */}
         <div className="flex flex-col justify-between">
           <div>
             <span className="text-blue-500 font-bold uppercase text-xs px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">
@@ -184,7 +180,6 @@ function ProductDetails() {
             </div>
           </div>
 
-          {/* Seller Box */}
           <div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
             <div className="flex justify-between items-center mb-4">
               <div>
@@ -194,7 +189,6 @@ function ProductDetails() {
                 </Link>
               </div>
               
-              {/* --- CORRECTED BUTTON LOGIC --- */}
               {isOwner && (
                 <div className="flex gap-2">
                   {isEditing ? (
@@ -243,7 +237,6 @@ function ProductDetails() {
         </div>
       </div>
 
-      {/* Image Zoom Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4" onClick={() => setIsModalOpen(false)}>
           <img src={mainImg} className="max-w-full max-h-full rounded-lg shadow-2xl" alt="Full view" />

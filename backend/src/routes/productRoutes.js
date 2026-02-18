@@ -1,13 +1,10 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import upload from '../config/cloudinary.js'; // 🔥 YOU FORGOT THIS
+import upload from '../config/cloudinary.js'; 
 
 const router = express.Router();
 
-/* ---------------------------
-   GET MY ITEMS (PROTECTED)
-----------------------------*/
 router.get('/my-items', authMiddleware, async (req, res) => {
   try {
     const products = await Product.find({ seller: req.user._id })
@@ -21,10 +18,6 @@ router.get('/my-items', authMiddleware, async (req, res) => {
   }
 });
 
-
-/* ---------------------------
-   CREATE PRODUCT (PROTECTED)
-----------------------------*/
 router.post(
   '/create',
   authMiddleware,
@@ -60,10 +53,6 @@ router.post(
   }
 );
 
-
-/* ---------------------------
-   DELETE PRODUCT (PROTECTED)
-----------------------------*/
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -86,9 +75,6 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 
-/* ---------------------------
-   GET ALL PRODUCTS
-----------------------------*/
 router.get('/all', async (req, res) => {
   try {
     const products = await Product.find()
@@ -103,9 +89,6 @@ router.get('/all', async (req, res) => {
 });
 
 
-/* ---------------------------
-   GET SINGLE PRODUCT
-----------------------------*/
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
@@ -122,13 +105,11 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// Update Product
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Check ownership
     if (product.seller.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "You can only edit your own products" });
     }

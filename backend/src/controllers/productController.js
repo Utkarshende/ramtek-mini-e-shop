@@ -2,7 +2,6 @@ import Product from "../models/Product.js";
 
 export const createProduct = async (req, res) => {
   try {
-    // req.user._id comes from your authMiddleware
     const sellerId = req.user?._id || req.body.seller; 
 
     if (!sellerId) {
@@ -14,11 +13,10 @@ export const createProduct = async (req, res) => {
     const newProduct = new Product({
       ...req.body,
       images: imageUrls,
-      seller: sellerId // Use the ID from the token
+      seller: sellerId 
     });
 
     await newProduct.save();
-    // Populate seller info so the frontend receives the full object immediately
     const populatedProduct = await newProduct.populate("seller", "name email");
 
     res.status(201).json({
@@ -30,12 +28,10 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// GET SINGLE PRODUCT
 export const getSingleProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
-      .populate("seller", "name email"); // 👈 VERY IMPORTANT
-
+      .populate("seller", "name email"); 
     if (!product) {
       return res.status(404).json({
         success: false,

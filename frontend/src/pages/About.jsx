@@ -7,7 +7,6 @@ function About() {
   const [isLoading, setIsLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // 1. Safe parsing of user - handles both .id and ._id formats
   const user = JSON.parse(localStorage.getItem('user')) || null;
   const loggedInId = user?.id || user?._id;
 
@@ -52,7 +51,6 @@ function About() {
       await API.delete(`/reviews/${id}`); 
       fetchReviews();
     } catch (err) {
-      // If this fails with 403, it's a backend ownership mismatch
       alert("Delete failed: Forbidden. You can only delete your own reviews.");
       console.error(err);
     }
@@ -61,7 +59,6 @@ function About() {
   const handleEdit = (review) => {
     setEditingId(review._id);
     setNewReview(review.comment);
-    // Scroll to input for better UX
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
 
@@ -71,10 +68,32 @@ function About() {
         <h1 className="text-4xl font-bold mb-6 tracking-tight">
           About <span className="text-blue-500">Ramtek Bazar</span>
         </h1>
-        <p className="text-slate-400 text-lg leading-relaxed mb-12">
-          The hyper-local marketplace for the people of Ramtek. Buy, sell, and trade items 
-          within your community with zero middleman and 100% transparency.
-        </p>
+       // About.jsx update
+<div className="space-y-12">
+  <section>
+    <h2 className="text-2xl font-bold text-blue-500 mb-4">Our Mission</h2>
+    <p className="text-slate-300 leading-relaxed">
+      Ramtek Bazar was developed to bridge the gap between local buyers and sellers. 
+      By removing middlemen and providing a direct platform, we empower the community 
+      to trade everything from electronics to agri-tools with trust and transparency.
+    </p>
+  </section>
+
+  <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800">
+      <h3 className="text-blue-400 font-bold mb-2">Hyper-Local</h3>
+      <p className="text-xs text-slate-400">Tailored specifically for the Ramtek and Nagpur district area.</p>
+    </div>
+    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800">
+      <h3 className="text-blue-400 font-bold mb-2">Secure Trading</h3>
+      <p className="text-xs text-slate-400">Direct WhatsApp integration ensures you talk to real people.</p>
+    </div>
+    <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800">
+      <h3 className="text-blue-400 font-bold mb-2">Zero Fees</h3>
+      <p className="text-xs text-slate-400">Listing items is 100% free for all residents of Ramtek.</p>
+    </div>
+  </section>
+</div>
 
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-left mb-16 shadow-2xl">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
@@ -85,9 +104,7 @@ function About() {
           <div className="space-y-4 mb-8 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
             {reviews.length > 0 ? (
               reviews.map((review) => {
-                // 2. LOGIC FIX: Extract reviewer ID safely
                 const reviewerId = review.user?._id || review.user;
-                // 3. LOGIC FIX: Compare strings to avoid Object vs String mismatch
                 const isReviewOwner = loggedInId && reviewerId && String(loggedInId) === String(reviewerId);
 
                 return (

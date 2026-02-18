@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login button clicked!", formData); // DEBUG LOG
+    console.log("Login button clicked!", formData); 
     
     setLoading(true);
     try {
@@ -35,7 +35,6 @@ function Login() {
       <div className="max-w-md w-full bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
         <h2 className="text-3xl font-bold text-white mb-6 text-center tracking-tight">Welcome Back</h2>
         
-        {/* MAKE SURE THIS FORM HAS ONSUBMIT */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-slate-400 text-sm mb-1 ml-1">Email</label>
@@ -59,7 +58,7 @@ function Login() {
           </div>
           
           <button 
-            type="submit" // EXPLICITLY SET TYPE TO SUBMIT
+            type="submit" 
             disabled={loading}
             className={`w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl mt-4 shadow-lg shadow-blue-900/20 transition-all active:scale-95 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
