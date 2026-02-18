@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import API from '../api.js';
 
 function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,7 +15,7 @@ function ProductDetails() {
   const [editData, setEditData] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Get user safely
+  // Get user safely from localStorage
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
   useEffect(() => {
@@ -28,7 +29,6 @@ function ProductDetails() {
         setEditData(currentProduct); 
         setMainImg(currentProduct.images[0]);
 
-        // Fetch related products
         const relatedRes = await API.get(`/products/all?category=${currentProduct.category}`);
         const filtered = relatedRes.data.data.filter(item => item._id !== id);
         setRelated(filtered.slice(0, 4));
@@ -55,6 +55,18 @@ function ProductDetails() {
       alert("Update failed. Please try again.");
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+      try {
+        await API.delete(`/products/${id}`);
+        alert("Product deleted!");
+        navigate('/');
+      } catch (err) {
+        alert("Delete failed.");
+      }
     }
   };
 
@@ -93,8 +105,10 @@ function ProductDetails() {
 
   if (!product) return <div className="text-white p-10 text-center">Product not found.</div>;
 
-    const isOwner = user && product.seller && 
-  String(user._id).trim().toLowerCase() === String(product.seller._id || product.seller).trim().toLowerCase();
+  // --- LOGIC FIX: Check for .id (LocalStorage) against ._id (Backend) ---
+  const loggedInId = user?.id || user?._id;
+  const sellerId = product.seller?._id || product.seller;
+  const isOwner = loggedInId && sellerId && String(loggedInId) === String(sellerId);
 
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-10">
@@ -179,14 +193,42 @@ function ProductDetails() {
                   {product.seller?.name || "Verified Seller"}
                 </Link>
               </div>
-             
-{console.log("Logged User:", String(user?._id).trim().toLowerCase())}
-{console.log("Seller ID:", String(product.seller?._id || product.seller).trim().toLowerCase())}
-{console.log("FINAL MATCH:", isOwner)}
-
-{user && product.seller && String(user._id) === String(product.seller._id) && (
-   <button onClick={() => setIsEditing(true)}>Edit Listing</button>
-)}
+              
+              {/* --- CORRECTED BUTTON LOGIC --- */}
+              {isOwner && (
+                <div className="flex gap-2">
+                  {isEditing ? (
+                    <>
+                      <button 
+                        onClick={handleInlineUpdate}
+                        disabled={isUpdating}
+                        className="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-green-500 transition-all"
+                      >
+                        {isUpdating ? "Saving..." : "Save"}
+                      </button>
+                      <button 
+                        onClick={handleDelete}
+                        className="bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"
+                      >
+                        Delete
+                      </button>
+                      <button 
+                        onClick={() => { setIsEditing(false); setEditData(product); }}
+                        className="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold border border-slate-700 transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black border border-yellow-500/20 px-4 py-2 rounded-xl text-sm font-bold transition-all"
+                    >
+                      Edit Listing
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4">
