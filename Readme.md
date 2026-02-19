@@ -6,7 +6,7 @@ Ramtek Bazar is a hyper-local C2C (Consumer-to-Consumer) marketplace designed to
 
 Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in action!
 
-![Home Screen](./frontend/src/assets/home-screenshot.png) 
+![Home Screen](./frontend/src/assets/homepage-demo.png) 
 
 ## 🌟 Key Features
 
