@@ -8,6 +8,7 @@ Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in act
 
 ![Home Screen](./frontend/public/assets/homepage-demo.png) 
 
+
 ## 🌟 Key Features
 
 - **User Authentication:** Secure registration and login using JWT (JSON Web Tokens).
@@ -27,7 +28,7 @@ Visit the 👉🏻 [live demo](https://ramtek-shop.netlify.app) to see it in act
 
 1. **Clone repo:**
    ```bash
-   git clone [https://github.com/Utkarshende/ramtek-mini-e-shop.git](https://github.com/Utkarshende/ramtek-mini-e-shop.git)
+   git clone <repo-url>
 
 2. **Install backend deps:**
    ```bash
