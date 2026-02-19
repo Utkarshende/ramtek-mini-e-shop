@@ -4,6 +4,17 @@ import Product from '../models/Product.js';
 
 const router = express.Router();
 
+router.get('/seller/:id', async (req, res) => {
+  try {
+    const seller = await User.findById(req.params.id).select('-password');
+    const products = await Product.find({ seller: req.params.id });
+    res.json({ success: true, seller, products });
+  } catch (error) {
+    res.status(500).json({ message: "Seller not found" });
+  }
+});
+
+
 router.get('/:id', async (req, res) => {
   try {
     const seller = await User.findById(req.params.id).select('-password');
@@ -24,14 +35,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.get('/seller/:id', async (req, res) => {
-  try {
-    const seller = await User.findById(req.params.id).select('-password');
-    const products = await Product.find({ seller: req.params.id });
-    res.json({ success: true, seller, products });
-  } catch (error) {
-    res.status(500).json({ message: "Seller not found" });
-  }
-});
+
 
 export default router;
