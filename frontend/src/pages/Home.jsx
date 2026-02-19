@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import API from '../api.js';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../config/constants.js';
-
+import { APP_NAME } from '../config/theme.js';
+n
 function Home() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
-
-  //const categories = ["All","Electronics", "Vehicles", "Furniture", "Real Estate", "Books","Other"];//
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,10 +36,12 @@ function Home() {
         {/* Header Section */}
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
-            Explore <span className="text-blue-500">Ramtek</span>
+            Explore <span className="text-blue-500">{APP_NAME}</span>
           </h1>
           <p className="text-slate-500 font-medium">Find the best deals in your local bazar.</p>
         </div>
+
+        s
         
         {/* Search and Filter Bar */}
         <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-900 p-4 rounded-3xl border border-slate-800 mb-12 shadow-2xl">

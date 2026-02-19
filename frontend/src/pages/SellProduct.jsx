@@ -62,10 +62,11 @@ function SellProduct() {
     } finally {
       setIsUploading(false);
     }
-  };
+  };  
 
-  return (
+  return (    
     <div className="min-h-screen bg-slate-950 p-6 flex justify-center text-white font-sans">
+      
       <form onSubmit={handleSubmit} className="max-w-2xl w-full bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 shadow-2xl">
         <div className="border-b border-slate-800 pb-4">
           <h2 className="text-3xl font-bold italic tracking-tight">RAMTEK <span className="text-blue-500">BAZAR</span></h2>

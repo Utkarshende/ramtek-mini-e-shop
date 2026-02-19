@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { APP_NAME } from '../config/theme.js';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ function Navbar() {
     <nav className="bg-slate-950 border-b border-slate-900 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
       <div className="flex items-center gap-8">
         <NavLink to="/" className="text-xl font-bold text-white tracking-tighter">
-          RAMTEK <span className="text-blue-600">BAZAR</span>
-        </NavLink>
+{APP_NAME}      
+  </NavLink>
         
         {/* Navigation Links */}
         <div className="hidden md:flex gap-6 text-sm uppercase tracking-widest">

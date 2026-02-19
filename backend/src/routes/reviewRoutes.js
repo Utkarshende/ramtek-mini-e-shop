@@ -50,7 +50,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
 
     review.comment = req.body.comment || review.comment;
-    await review.save();
+    await review.save();a
 
     const updatedReview = await review.populate('user', 'name');
     res.json({ success: true, data: updatedReview });

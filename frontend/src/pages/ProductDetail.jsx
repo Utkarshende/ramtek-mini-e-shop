@@ -19,9 +19,9 @@ function ProductDetails() {
 
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
-  // ================= FETCH PRODUCT =================
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
         const { data } = await API.get(`/products/${id}`);
         const currentProduct = data.data;
@@ -30,6 +30,7 @@ function ProductDetails() {
         setEditData(currentProduct);
         setMainImg(currentProduct.images?.[0] || "");
 
+        // Fetch related products safely
         const relatedRes = await API.get(
           `/products/all?category=${encodeURIComponent(currentProduct.category)}`
         );
@@ -41,20 +42,19 @@ function ProductDetails() {
         setRelated(filtered.slice(0, 4));
 
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching product:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchAllData();
     window.scrollTo(0, 0);
   }, [id]);
 
-  // ================= UPDATE =================
   const handleInlineUpdate = async () => {
+    setIsUpdating(true);
     try {
-      setIsUpdating(true);
       const res = await API.put(`/products/${id}`, editData);
       setProduct(res.data.data);
       setIsEditing(false);
@@ -66,62 +66,64 @@ function ProductDetails() {
     }
   };
 
-  // ================= DELETE =================
   const handleDelete = async () => {
-    if (!window.confirm("Delete this listing?")) return;
-
-    try {
-      await API.delete(`/products/${id}`);
-      alert("Product deleted!");
-      navigate('/');
-    } catch (err) {
-      alert("Delete failed.");
-    }
-  };
-
-  // ================= WHATSAPP =================
-  const handleContact = () => {
-    const phone =
-      product?.seller?.phone ||
-      product?.phoneNumber ||
-      "";
-
-    if (!phone) {
-      alert("Seller phone number not available.");
-      return;
-    }
-
-    const cleanedPhone = phone.replace(/\D/g, '');
-
-    const message = `Hi, I am interested in your product "${product.title}" listed on Ramtek Bazar.`;
-
-    const whatsappURL = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
-
-    window.open(whatsappURL, "_blank");
-  };
-
-  // ================= SHARE =================
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: product.title,
-          text: product.description,
-          url: window.location.href,
-        });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+    if (window.confirm("Delete this listing?")) {
+      try {
+        await API.delete(`/products/${id}`);
+        alert("Product deleted!");
+        navigate('/');
+      } catch (err) {
+        alert("Delete failed.");
       }
-    } catch (err) {
-      console.log("Share cancelled");
     }
   };
+
+  // ================= CONTACT =================
+const handleContact = () => {
+  // 1. Check if the phone number exists (checking both product.phoneNumber and product.seller.phone)
+  const phoneNumber = product?.phoneNumber || product?.seller?.phone;
+
+  if (!phoneNumber) {
+    alert("Seller contact information is not available.");
+    return;
+  }
+
+  // 2. Clean the phone number (remove spaces, +, and dashes)
+  // WhatsApp API needs a pure numerical string
+  const cleanNumber = phoneNumber.replace(/\D/g, '');
+
+  // 3. Optional: Add a pre-filled message
+  const message = encodeURIComponent(`Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`);
+
+  // 4. Redirect the user
+  window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
+};
+
+// ================= SHARE =================
+const handleShare = async () => {
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: product.title,
+        text: product.description,
+        url: window.location.href,
+      });
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    }
+  } catch (err) {
+    console.log("Share cancelled");
+  }
+};
+
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-blue-500 text-xl font-bold">
-        LOADING...
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-blue-500 text-xl font-bold animate-pulse">
+          LOADING...
+        </div>
       </div>
     );
   }
@@ -140,18 +142,20 @@ function ProductDetails() {
     loggedInId && sellerId && String(loggedInId) === String(sellerId);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-white">
+    <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
 
-        {/* LEFT IMAGES */}
+        {/* LEFT SIDE IMAGES */}
         <div>
-          <div className="aspect-square bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
-            <img
-              src={mainImg}
-              alt={product.title}
-              className="w-full h-full object-contain cursor-pointer"
-              onClick={() => setIsModalOpen(true)}
-            />
+          <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
+            {mainImg && (
+              <img
+                src={mainImg}
+                alt={product.title}
+                className="w-full h-full object-contain cursor-pointer"
+                onClick={() => setIsModalOpen(true)}
+              />
+            )}
           </div>
 
           <div className="flex gap-3 mt-4 overflow-x-auto">
@@ -170,108 +174,160 @@ function ProductDetails() {
           </div>
         </div>
 
-        {/* RIGHT DETAILS */}
+        {/* RIGHT SIDE DETAILS */}
         <div className="flex flex-col justify-between">
 
           <div>
-            <span className="text-blue-500 text-sm uppercase font-bold">
-              {product.category}
-            </span>
+            {/* CATEGORY */}
+            {isEditing ? (
+              <select
+                value={editData.category}
+                onChange={(e) =>
+                  setEditData({ ...editData, category: e.target.value })
+                }
+                className="bg-slate-950 border border-blue-500 text-white px-4 py-2 rounded-xl"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-blue-500 text-sm font-bold uppercase">
+                {product.category}
+              </span>
+            )}
 
-            <h1 className="text-4xl font-bold mt-4">
-              {product.title}
-            </h1>
+            {/* TITLE */}
+            {isEditing ? (
+              <input
+                className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
+                value={editData.title}
+                onChange={(e) =>
+                  setEditData({ ...editData, title: e.target.value })
+                }
+              />
+            ) : (
+              <h1 className="text-4xl font-bold text-white mt-4">
+                {product.title}
+              </h1>
+            )}
 
-            <p className="text-3xl mt-4">
-              ₹{product.price?.toLocaleString("en-IN")}
-            </p>
+            {/* PRICE */}
+            <div className="mt-4">
+              {isEditing ? (
+                <input
+                  type="number"
+                  className="bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 text-white text-2xl"
+                  value={editData.price}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      price: Number(e.target.value),
+                    })
+                  }
+                />
+              ) : (
+                <p className="text-3xl text-white">
+                  ₹{product.price?.toLocaleString("en-IN")}
+                </p>
+              )}
+            </div>
 
+            {/* DESCRIPTION */}
             <div className="mt-6">
               <h4 className="text-slate-400 text-xs uppercase mb-2">
                 Description
               </h4>
-              <p className="text-slate-300 whitespace-pre-wrap">
-                {product.description}
-              </p>
+
+              {isEditing ? (
+                <textarea
+                  className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
+                  value={editData.description}
+                  onChange={(e) =>
+                    setEditData({
+                      ...editData,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              ) : (
+                <p className="text-slate-300 whitespace-pre-wrap">
+                  {product.description}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* SELLER SECTION */}
-          <div className="mt-8 border-t border-slate-800 pt-6">
+          {/* SELLER + ACTIONS */}
+          <div className="mt-8 pt-6">
 
-            <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
 
-              <p className="text-slate-400 text-xs uppercase mb-2">
-                Seller Information
-              </p>
+            {/* Seller Box */}
+<div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
 
-              <Link
-                to={`/seller/${sellerId}`}
-                className="text-blue-400 font-bold hover:underline"
-              >
-                {product.seller?.name || "Seller"}
-              </Link>
+  {/* Seller Name */}
+  <div className="flex justify-between items-center mb-4">
+    <div>
+      <p className="text-slate-500 text-xs uppercase mb-1">
+        Seller Information
+      </p>
 
-              {/* ACTION BUTTONS */}
-              <div className="flex gap-4 mt-6 flex-wrap">
+      <Link to={`/seller/${sellerId}`} className='text-slate-300 font-bold text-lg underline'>
+        {product.seller?.name}
+      </Link>
+    </div>
 
-                {!isOwner && (
+  </div>
+
+  {/* EVERYONE sees chat & share */}
+  <div className="flex gap-4 mt-6 flex-wrap">
+    <button onClick={handleContact} className='text-green-500'>
+      Chat via  WhatsApp 
+    </button>
+
+    <button onClick={handleShare} className='text-slate-300'>
+      Share
+    </button>
+  </div>
+
+</div>
+
+
+            {isOwner && (
+              <div className="flex gap-3 mt-4">
+                {isEditing ? (
                   <>
                     <button
-                      onClick={handleContact}
-                      className="bg-green-600 hover:bg-green-500 px-5 py-2 rounded-xl font-semibold"
+                      onClick={handleInlineUpdate}
+                      className="bg-green-600 text-white px-4 py-2 rounded-xl"
                     >
-                      Chat on WhatsApp
+                      Save
                     </button>
-
                     <button
-                      onClick={handleShare}
-                      className="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-xl font-semibold"
+                      onClick={handleDelete}
+                      className="bg-red-600 text-white px-4 py-2 rounded-xl"
                     >
-                      Share
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="bg-slate-700 text-white px-4 py-2 rounded-xl"
+                    >
+                      Cancel
                     </button>
                   </>
+                ) : (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
+                  >
+                    Edit Listing
+                  </button>
                 )}
-
-                {isOwner && (
-                  <>
-                    {!isEditing ? (
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="bg-yellow-500 text-black px-5 py-2 rounded-xl font-semibold"
-                      >
-                        Edit Listing
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={handleInlineUpdate}
-                          disabled={isUpdating}
-                          className="bg-green-600 px-5 py-2 rounded-xl"
-                        >
-                          Save
-                        </button>
-
-                        <button
-                          onClick={handleDelete}
-                          className="bg-red-600 px-5 py-2 rounded-xl"
-                        >
-                          Delete
-                        </button>
-
-                        <button
-                          onClick={() => setIsEditing(false)}
-                          className="bg-slate-700 px-5 py-2 rounded-xl"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-
               </div>
-            </div>
+            )}
           </div>
 
         </div>
