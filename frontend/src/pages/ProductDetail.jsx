@@ -19,9 +19,9 @@ function ProductDetails() {
 
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
+  // ================= FETCH PRODUCT =================
   useEffect(() => {
-    const fetchAllData = async () => {
-      setLoading(true);
+    const fetchData = async () => {
       try {
         const { data } = await API.get(`/products/${id}`);
         const currentProduct = data.data;
@@ -30,7 +30,6 @@ function ProductDetails() {
         setEditData(currentProduct);
         setMainImg(currentProduct.images?.[0] || "");
 
-        // Fetch related products safely
         const relatedRes = await API.get(
           `/products/all?category=${encodeURIComponent(currentProduct.category)}`
         );
@@ -42,19 +41,20 @@ function ProductDetails() {
         setRelated(filtered.slice(0, 4));
 
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAllData();
+    fetchData();
     window.scrollTo(0, 0);
   }, [id]);
 
+  // ================= UPDATE =================
   const handleInlineUpdate = async () => {
-    setIsUpdating(true);
     try {
+      setIsUpdating(true);
       const res = await API.put(`/products/${id}`, editData);
       setProduct(res.data.data);
       setIsEditing(false);
@@ -66,57 +66,62 @@ function ProductDetails() {
     }
   };
 
+  // ================= DELETE =================
   const handleDelete = async () => {
-    if (window.confirm("Delete this listing?")) {
-      try {
-        await API.delete(`/products/${id}`);
-        alert("Product deleted!");
-        navigate('/');
-      } catch (err) {
-        alert("Delete failed.");
-      }
+    if (!window.confirm("Delete this listing?")) return;
+
+    try {
+      await API.delete(`/products/${id}`);
+      alert("Product deleted!");
+      navigate('/');
+    } catch (err) {
+      alert("Delete failed.");
     }
   };
 
-  // ================= CONTACT =================
-const handleContact = () => {
-  if (!product?.seller?.phone) {
-    alert("Seller phone number not available.");
-    return;
-  }
+  // ================= WHATSAPP =================
+  const handleContact = () => {
+    const phone =
+      product?.seller?.phone ||
+      product?.phoneNumber ||
+      "";
 
-  const message = `Hi, I'm interested in your product: ${product.title}`;
-  window.open(
-    `https://wa.me/${product.seller.phone}?text=${encodeURIComponent(message)}`,
-    "_blank"
-  );
-};
-
-// ================= SHARE =================
-const handleShare = async () => {
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: product.title,
-        text: product.description,
-        url: window.location.href,
-      });
-    } else {
-      await navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
+    if (!phone) {
+      alert("Seller phone number not available.");
+      return;
     }
-  } catch (err) {
-    console.log("Share cancelled");
-  }
-};
 
+    const cleanedPhone = phone.replace(/\D/g, '');
+
+    const message = `Hi, I am interested in your product "${product.title}" listed on Ramtek Bazar.`;
+
+    const whatsappURL = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappURL, "_blank");
+  };
+
+  // ================= SHARE =================
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: product.title,
+          text: product.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      }
+    } catch (err) {
+      console.log("Share cancelled");
+    }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-blue-500 text-xl font-bold animate-pulse">
-          LOADING...
-        </div>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-blue-500 text-xl font-bold">
+        LOADING...
       </div>
     );
   }
@@ -135,20 +140,18 @@ const handleShare = async () => {
     loggedInId && sellerId && String(loggedInId) === String(sellerId);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6">
+    <div className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
 
-        {/* LEFT SIDE IMAGES */}
+        {/* LEFT IMAGES */}
         <div>
-          <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
-            {mainImg && (
-              <img
-                src={mainImg}
-                alt={product.title}
-                className="w-full h-full object-contain cursor-pointer"
-                onClick={() => setIsModalOpen(true)}
-              />
-            )}
+          <div className="aspect-square bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
+            <img
+              src={mainImg}
+              alt={product.title}
+              className="w-full h-full object-contain cursor-pointer"
+              onClick={() => setIsModalOpen(true)}
+            />
           </div>
 
           <div className="flex gap-3 mt-4 overflow-x-auto">
@@ -167,170 +170,108 @@ const handleShare = async () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE DETAILS */}
+        {/* RIGHT DETAILS */}
         <div className="flex flex-col justify-between">
 
           <div>
-            {/* CATEGORY */}
-            {isEditing ? (
-              <select
-                value={editData.category}
-                onChange={(e) =>
-                  setEditData({ ...editData, category: e.target.value })
-                }
-                className="bg-slate-950 border border-blue-500 text-white px-4 py-2 rounded-xl"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="text-blue-500 text-sm font-bold uppercase">
-                {product.category}
-              </span>
-            )}
+            <span className="text-blue-500 text-sm uppercase font-bold">
+              {product.category}
+            </span>
 
-            {/* TITLE */}
-            {isEditing ? (
-              <input
-                className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
-                value={editData.title}
-                onChange={(e) =>
-                  setEditData({ ...editData, title: e.target.value })
-                }
-              />
-            ) : (
-              <h1 className="text-4xl font-bold text-white mt-4">
-                {product.title}
-              </h1>
-            )}
+            <h1 className="text-4xl font-bold mt-4">
+              {product.title}
+            </h1>
 
-            {/* PRICE */}
-            <div className="mt-4">
-              {isEditing ? (
-                <input
-                  type="number"
-                  className="bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 text-white text-2xl"
-                  value={editData.price}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      price: Number(e.target.value),
-                    })
-                  }
-                />
-              ) : (
-                <p className="text-3xl text-white">
-                  ₹{product.price?.toLocaleString("en-IN")}
-                </p>
-              )}
-            </div>
+            <p className="text-3xl mt-4">
+              ₹{product.price?.toLocaleString("en-IN")}
+            </p>
 
-            {/* DESCRIPTION */}
             <div className="mt-6">
               <h4 className="text-slate-400 text-xs uppercase mb-2">
                 Description
               </h4>
-
-              {isEditing ? (
-                <textarea
-                  className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
-                  value={editData.description}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              ) : (
-                <p className="text-slate-300 whitespace-pre-wrap">
-                  {product.description}
-                </p>
-              )}
+              <p className="text-slate-300 whitespace-pre-wrap">
+                {product.description}
+              </p>
             </div>
           </div>
 
-          {/* SELLER + ACTIONS */}
+          {/* SELLER SECTION */}
           <div className="mt-8 border-t border-slate-800 pt-6">
 
-            <Link
-              to={`/seller/${sellerId}`}
-              className="text-blue-400 font-bold hover:underline"
-            >
-              {product.seller?.name || "Seller Profile"}
-            </Link>
+            <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
 
-            {/* Seller Box */}
-<div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
+              <p className="text-slate-400 text-xs uppercase mb-2">
+                Seller Information
+              </p>
 
-  {/* Seller Name */}
-  <div className="flex justify-between items-center mb-4">
-    <div>
-      <p className="text-slate-500 text-xs uppercase mb-1">
-        Seller Information
-      </p>
+              <Link
+                to={`/seller/${sellerId}`}
+                className="text-blue-400 font-bold hover:underline"
+              >
+                {product.seller?.name || "Seller"}
+              </Link>
 
-      <Link to={`/seller/${sellerId}`}>
-        {product.seller?.name}
-      </Link>
-    </div>
+              {/* ACTION BUTTONS */}
+              <div className="flex gap-4 mt-6 flex-wrap">
 
-    {/* ONLY owner sees edit */}
-    {isOwner && (
-      <button>Edit Listing</button>
-    )}
-  </div>
-
-  {/* EVERYONE sees chat & share */}
-  <div className="flex gap-4">
-    <button onClick={handleContact}>
-      Chat via WhatsApp
-    </button>
-
-    <button onClick={handleShare}>
-      Share
-    </button>
-  </div>
-
-</div>
-
-
-            {isOwner && (
-              <div className="flex gap-3 mt-4">
-                {isEditing ? (
+                {!isOwner && (
                   <>
                     <button
-                      onClick={handleInlineUpdate}
-                      className="bg-green-600 text-white px-4 py-2 rounded-xl"
+                      onClick={handleContact}
+                      className="bg-green-600 hover:bg-green-500 px-5 py-2 rounded-xl font-semibold"
                     >
-                      Save
+                      Chat on WhatsApp
                     </button>
+
                     <button
-                      onClick={handleDelete}
-                      className="bg-red-600 text-white px-4 py-2 rounded-xl"
+                      onClick={handleShare}
+                      className="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-xl font-semibold"
                     >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="bg-slate-700 text-white px-4 py-2 rounded-xl"
-                    >
-                      Cancel
+                      Share
                     </button>
                   </>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
-                  >
-                    Edit Listing
-                  </button>
                 )}
+
+                {isOwner && (
+                  <>
+                    {!isEditing ? (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-yellow-500 text-black px-5 py-2 rounded-xl font-semibold"
+                      >
+                        Edit Listing
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleInlineUpdate}
+                          disabled={isUpdating}
+                          className="bg-green-600 px-5 py-2 rounded-xl"
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          onClick={handleDelete}
+                          className="bg-red-600 px-5 py-2 rounded-xl"
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          onClick={() => setIsEditing(false)}
+                          className="bg-slate-700 px-5 py-2 rounded-xl"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+
               </div>
-            )}
+            </div>
           </div>
 
         </div>
