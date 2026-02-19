@@ -3,7 +3,7 @@ import API from '../api.js';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../config/constants.js';
 import { APP_NAME } from '../config/theme.js';
-n
+
 function Home() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
