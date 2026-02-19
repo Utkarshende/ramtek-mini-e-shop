@@ -17,10 +17,9 @@ connectDB();
 
 const app = express();
 
-/* ================= SECURITY MIDDLEWARE ================= */
 
-app.use(helmet()); // Secure HTTP headers
-app.use(compression()); // Compress responses
+app.use(helmet()); 
+app.use(compression()); 
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -28,7 +27,6 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-/* ================= CORS CONFIG ================= */
 
 const allowedOrigins = [
   "https://ramtek-shop.netlify.app",
@@ -54,11 +52,9 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-/* ================= BODY PARSER ================= */
 
 app.use(express.json());
 
-/* ================= ROUTES ================= */
 
 app.get("/", (req, res) => {
   res.send("🚀 Ramtek Bazar API is running smoothly");
@@ -69,7 +65,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/users", userRoutes);
 
-/* ================= GLOBAL ERROR HANDLER ================= */
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -80,7 +75,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* ================= SERVER START ================= */
 
 const PORT = process.env.PORT || 5000;
 

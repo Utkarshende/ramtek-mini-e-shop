@@ -156,7 +156,6 @@ function About() {
                             Edit
                           </button>
 
-                          {/* ✅ FIX IS HERE */}
                           <button
                             onClick={() => handleDelete(review._id)}
                             className="text-red-500/80 hover:text-red-400"

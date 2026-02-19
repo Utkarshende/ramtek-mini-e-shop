@@ -81,12 +81,10 @@ router.get('/all', async (req, res) => {
 
     let filter = {};
 
-    // Category filter
     if (category && category !== "All") {
       filter.category = category;
     }
 
-    // Search filter
     if (search) {
       filter.title = { $regex: search, $options: "i" };
     }

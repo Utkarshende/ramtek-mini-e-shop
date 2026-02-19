@@ -12,7 +12,6 @@ function Navbar() {
     window.location.reload();
   };
 
-  // Helper for active link styling
   const linkStyle = ({ isActive }) => 
     isActive ? "text-blue-500 font-medium" : "text-slate-400 hover:text-white transition-colors";
 
@@ -23,7 +22,7 @@ function Navbar() {
 {APP_NAME}      
   </NavLink>
         
-        {/* Navigation Links */}
+      
         <div className="hidden md:flex gap-6 text-sm uppercase tracking-widest">
           <NavLink to="/" className={linkStyle}>Home</NavLink>
           <NavLink to="/about" className={linkStyle}>About</NavLink>

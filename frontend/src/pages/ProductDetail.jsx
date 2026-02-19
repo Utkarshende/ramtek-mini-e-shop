@@ -30,7 +30,6 @@ function ProductDetails() {
         setEditData(currentProduct);
         setMainImg(currentProduct.images?.[0] || "");
 
-        // Fetch related products safely
         const relatedRes = await API.get(
           `/products/all?category=${encodeURIComponent(currentProduct.category)}`
         );
@@ -78,9 +77,7 @@ function ProductDetails() {
     }
   };
 
-  // ================= CONTACT =================
 const handleContact = () => {
-  // 1. Check if the phone number exists (checking both product.phoneNumber and product.seller.phone)
   const phoneNumber = product?.phoneNumber || product?.seller?.phone;
 
   if (!phoneNumber) {
@@ -88,18 +85,14 @@ const handleContact = () => {
     return;
   }
 
-  // 2. Clean the phone number (remove spaces, +, and dashes)
-  // WhatsApp API needs a pure numerical string
+
   const cleanNumber = phoneNumber.replace(/\D/g, '');
 
-  // 3. Optional: Add a pre-filled message
   const message = encodeURIComponent(`Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`);
 
-  // 4. Redirect the user
   window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
 };
 
-// ================= SHARE =================
 const handleShare = async () => {
   try {
     if (navigator.share) {
@@ -145,7 +138,6 @@ const handleShare = async () => {
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
 
-        {/* LEFT SIDE IMAGES */}
         <div>
           <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
             {mainImg && (
@@ -174,11 +166,9 @@ const handleShare = async () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE DETAILS */}
         <div className="flex flex-col justify-between">
 
           <div>
-            {/* CATEGORY */}
             {isEditing ? (
               <select
                 value={editData.category}
@@ -199,7 +189,6 @@ const handleShare = async () => {
               </span>
             )}
 
-            {/* TITLE */}
             {isEditing ? (
               <input
                 className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
@@ -214,7 +203,6 @@ const handleShare = async () => {
               </h1>
             )}
 
-            {/* PRICE */}
             <div className="mt-4">
               {isEditing ? (
                 <input
@@ -235,7 +223,6 @@ const handleShare = async () => {
               )}
             </div>
 
-            {/* DESCRIPTION */}
             <div className="mt-6">
               <h4 className="text-slate-400 text-xs uppercase mb-2">
                 Description
@@ -260,14 +247,11 @@ const handleShare = async () => {
             </div>
           </div>
 
-          {/* SELLER + ACTIONS */}
           <div className="mt-8 pt-6">
 
 
-            {/* Seller Box */}
 <div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
 
-  {/* Seller Name */}
   <div className="flex justify-between items-center mb-4">
     <div>
       <p className="text-slate-500 text-xs uppercase mb-1">
@@ -281,7 +265,6 @@ const handleShare = async () => {
 
   </div>
 
-  {/* EVERYONE sees chat & share */}
   <div className="flex gap-4 mt-6 flex-wrap">
     <button onClick={handleContact} className='text-green-500'>
       Chat via  WhatsApp 
@@ -333,7 +316,6 @@ const handleShare = async () => {
         </div>
       </div>
 
-      {/* IMAGE MODAL */}
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black/95 flex items-center justify-center"

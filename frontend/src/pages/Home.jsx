@@ -33,7 +33,6 @@ function Home() {
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
             Explore <span className="text-blue-500">{APP_NAME}</span>
@@ -41,9 +40,8 @@ function Home() {
           <p className="text-slate-500 font-medium">Find the best deals in your local bazar.</p>
         </div>
 
-        s
         
-        {/* Search and Filter Bar */}
+        
         <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-900 p-4 rounded-3xl border border-slate-800 mb-12 shadow-2xl">
           <div className="relative w-full md:flex-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
@@ -67,7 +65,6 @@ function Home() {
           </select>
         </div>
 
-        {/* Loading State with Render Note */}
         {loading ? (
           <div className="flex flex-col justify-center items-center h-96 text-center space-y-6">
             <div className="text-blue-500 animate-spin text-5xl">⚙️</div>
@@ -86,7 +83,6 @@ function Home() {
               products.map((product) => (
                 <Link to={`/product/${product._id}`} key={product._id} className="group">
                   <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 flex flex-col h-full shadow-lg">
-                    {/* Image Container */}
                     <div className="relative aspect-square overflow-hidden">
                       <img 
                         src={product.images[0]} 
@@ -98,7 +94,6 @@ function Home() {
                       </div>
                     </div>
 
-                    {/* Content Container */}
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="text-white font-bold text-lg truncate group-hover:text-blue-400 transition-colors">
                         {product.title}

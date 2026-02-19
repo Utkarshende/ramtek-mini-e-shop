@@ -16,8 +16,8 @@ export default function EditProductModal({ product, onClose, onUpdate }) {
     setLoading(true);
     try {
       const res = await API.put(`/products/${product._id}`, formData);
-      onUpdate(res.data.data); // Update the UI in the parent
-      onClose(); // Close modal
+      onUpdate(res.data.data); 
+      onClose(); 
     } catch (err) {
       alert("Update failed. Make sure all fields are valid.");
     } finally {

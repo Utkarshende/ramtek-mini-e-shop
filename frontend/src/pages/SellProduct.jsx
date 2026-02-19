@@ -42,15 +42,12 @@ function SellProduct() {
     setIsUploading(true);
     
     const data = new FormData();
-    // Append text fields
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    // Append image files
     files.forEach(file => data.append('images', file));
 
     try {
       const response = await API.post('/products/create', data);
       
-      // Assuming backend returns { success: true, data: { _id: "..." } }
       const newId = response.data.data._id;
       
       alert("Product listed successfully!");
@@ -73,7 +70,6 @@ function SellProduct() {
           <p className="text-slate-400 text-sm mt-1">Sell your items to locals instantly.</p>
         </div>
 
-        {/* Image Upload Area */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-slate-300">Product Photos (Max 5)</label>
           <div className="flex flex-wrap gap-4 p-5 bg-slate-950/50 border-2 border-dashed border-slate-800 rounded-2xl hover:border-blue-500/50 transition-colors">
@@ -96,7 +92,6 @@ function SellProduct() {
           </div>
         </div>
 
-        {/* Input Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label className="text-xs text-slate-500 uppercase font-bold ml-1">Item Title</label>

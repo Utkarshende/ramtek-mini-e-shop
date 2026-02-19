@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom font or global resets go here */
 body {
   @apply antialiased text-gray-900;
 }

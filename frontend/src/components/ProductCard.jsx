@@ -7,7 +7,6 @@ function ProductCard({ item }) {
     <div>
         <Link to={`/product/${item._id}`}>
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
-      {/* Image Container */}
       <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
         {item.image ? (
           <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
@@ -17,7 +16,6 @@ function ProductCard({ item }) {
       </div>
       
 
-      {/* Content Container */}
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-800 truncate">{item.title}</h3>
         
