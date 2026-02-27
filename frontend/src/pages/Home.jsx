@@ -3,6 +3,8 @@ import API from '../api.js';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../config/constants.js';
 import { APP_NAME } from '../config/theme.js';
+import { toast } from 'react-toastify';
+import ImageSlider from '../components/ImageSlider.jsx';
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -84,11 +86,7 @@ function Home() {
                 <Link to={`/product/${product._id}`} key={product._id} className="group">
                   <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500 duration-300 flex flex-col h-full shadow-lg">
                     <div className="relative aspect-square overflow-hidden">
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.title} 
-                        className="w-full h-full object-cover transition-transform duration-500" 
-                      />
+                      <ImageSlider images={product.images} className="aspect-square" />
                       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white font-bold uppercase tracking-widest">
                         {product.category}
                       </div>

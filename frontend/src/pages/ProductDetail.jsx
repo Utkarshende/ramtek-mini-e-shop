@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import API from "../api.js";
 import { CATEGORIES } from "../config/constants.js";
 import { toast } from "react-toastify";
+import ImageSlider from "../components/ImageSlider.jsx";  
 
 function ProductDetails() {
   const { id } = useParams();
@@ -203,15 +204,8 @@ function ProductDetails() {
         {/* IMAGE SECTION */}
         <div>
           <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
-            {mainImg && (
-              <img
-                src={mainImg}
-                alt={product.title}
-                className="w-full h-full object-contain cursor-pointer"
-                onClick={() => setIsModalOpen(true)}
-              />
-            )}
-          </div>
+  <ImageSlider images={product.images} className="h-full" />
+</div>
         </div>
 
         {/* DETAILS SECTION */}

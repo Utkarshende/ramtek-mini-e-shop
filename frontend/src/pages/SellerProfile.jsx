@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import API from "../api.js";
 import { toast } from "react-toastify";
+import ImageSlider from "../components/ImageSlider.jsx";
 
 function SellerProfile() {
   const { id } = useParams();
@@ -91,11 +92,7 @@ function SellerProfile() {
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden transition hover:border-blue-500">
 
                   <div className="aspect-square bg-slate-950">
-                    <img
-                      src={product.images?.[0]}
-                      alt={product.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <ImageSlider images={product.images} className="aspect-square" />
                   </div>
 
                   <div className="p-4">
