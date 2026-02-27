@@ -277,6 +277,17 @@ function ProductDetails() {
             </p>
           )}
 
+          <div className="mt-6">
+  <p className="text-slate-400 text-sm">Seller</p>
+
+  <Link
+    to={`/seller/${product.seller?._id || product.seller}`}
+    className="text-blue-400 font-semibold hover:underline"
+  >
+    {product.seller?.name || "View Seller Profile"}
+  </Link>
+</div>
+
           {/* DESCRIPTION */}
           {isEditing ? (
             <div className="mt-6">

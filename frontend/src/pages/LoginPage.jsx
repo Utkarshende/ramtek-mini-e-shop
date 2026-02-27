@@ -42,8 +42,8 @@ function Login() {
         <h2 className="text-3xl font-bold text-white mb-6 text-center tracking-tight">
           Welcome Back
         </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4  ">
+        
           <InputField
             label="Email"
             type="email"
@@ -51,8 +51,8 @@ function Login() {
             value={formData.email}
             onChange={handleChange}
             placeholder="your@email.com"
-          />
 
+          />
           <InputField
             label="Password"
             type="password"
@@ -60,7 +60,7 @@ function Login() {
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-          />
+          />          
 
           <button
             type="submit"

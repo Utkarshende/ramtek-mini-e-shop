@@ -35,7 +35,7 @@ function App() {
               path="/sell"
               element={
                 <ProtectedRoute>
-                  <SellProduct />
+                  <SellProduct />s
                 </ProtectedRoute>
               }
             />

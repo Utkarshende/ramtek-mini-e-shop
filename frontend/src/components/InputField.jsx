@@ -19,9 +19,9 @@ function InputField({
       value={value}
       name={name}
       min={min}
-      maxLength={maxLegth}
+      maxLength={maxLength}
       onChange={onChange}
-      className="w-full bg-slate-900 border-slate-700 rounded-lg px-4 py-3 text-whote focus:outline-none focus:border-blue-500"
+      className="w-full bg-slate-800 border-slate-300 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500"
       />
       {isPassword && (
         <button 
