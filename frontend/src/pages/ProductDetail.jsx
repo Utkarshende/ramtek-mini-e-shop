@@ -8,11 +8,10 @@ function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null); // ✅ FIXED
+  const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [related, setRelated] = useState([]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
@@ -21,7 +20,7 @@ function ProductDetails() {
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchProduct = async () => {
       setLoading(true);
       try {
         const { data } = await API.get(`/products/${id}`);
@@ -30,18 +29,6 @@ function ProductDetails() {
         setProduct(currentProduct);
         setEditData(currentProduct);
         setMainImg(currentProduct.images?.[0] || "");
-
-        const relatedRes = await API.get(
-          `/products/all?category=${encodeURIComponent(
-            currentProduct.category
-          )}`
-        );
-
-        const filtered = relatedRes.data.data.filter(
-          (item) => item._id !== id
-        );
-
-        setRelated(filtered.slice(0, 4));
       } catch (err) {
         toast.error("Error loading product.");
       } finally {
@@ -49,11 +36,12 @@ function ProductDetails() {
       }
     };
 
-    fetchAllData();
+    fetchProduct();
     window.scrollTo(0, 0);
   }, [id]);
 
-  // 🎨 Dynamic Category Colors
+  /* ---------------- CATEGORY COLOR ---------------- */
+
   const getCategoryColor = (category) => {
     switch (category) {
       case "Electronics":
@@ -67,29 +55,57 @@ function ProductDetails() {
     }
   };
 
-  const handleInlineUpdate = async () => {
-    if (editData.price < 1) {
-      toast.error("Price must be greater than ₹1");
-      return;
+  /* ---------------- VALIDATION ---------------- */
+
+  const validateEditData = () => {
+    if (!editData.title?.trim()) {
+      toast.error("Title is required");
+      return false;
     }
 
-    if (editData.description.split(" ").length < 10) {
-      toast.error("Description must contain at least 10 words.");
-      return;
+    if (!editData.price || editData.price < 1) {
+      toast.error("Price must be greater than ₹1");
+      return false;
     }
+
+    const wordCount = editData.description?.trim().split(/\s+/).length;
+    if (!editData.description || wordCount < 100) {
+      toast.error("Description must be at least 100 words");
+      return false;
+    }
+
+    return true;
+  };
+
+  /* ---------------- UPDATE ---------------- */
+
+  const handleEdit = async () => {
+    if (!validateEditData()) return;
 
     setIsUpdating(true);
+
     try {
-      const res = await API.put(`/products/${id}`, editData);
+      const res = await API.put(`/products/${id}`, {
+        title: editData.title.trim(),
+        price: Number(editData.price),
+        description: editData.description.trim(),
+        category: editData.category,
+      });
+
       setProduct(res.data.data);
       setIsEditing(false);
+
       toast.success("Product updated successfully!");
     } catch (err) {
-      toast.error("Update failed.");
+      toast.error(
+        err.response?.data?.message || "Failed to update product"
+      );
     } finally {
       setIsUpdating(false);
     }
   };
+
+  /* ---------------- DELETE ---------------- */
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm("Delete this listing?");
@@ -104,6 +120,8 @@ function ProductDetails() {
     }
   };
 
+  /* ---------------- CONTACT ---------------- */
+
   const handleContact = () => {
     const phoneNumber =
       product?.phoneNumber || product?.seller?.phone;
@@ -114,6 +132,7 @@ function ProductDetails() {
     }
 
     const cleanNumber = phoneNumber.replace(/\D/g, "");
+
     const message = encodeURIComponent(
       `Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`
     );
@@ -123,6 +142,8 @@ function ProductDetails() {
       "_blank"
     );
   };
+
+  /* ---------------- SHARE ---------------- */
 
   const handleShare = async () => {
     try {
@@ -136,8 +157,10 @@ function ProductDetails() {
         await navigator.clipboard.writeText(window.location.href);
         toast.success("Link copied to clipboard!");
       }
-    } catch (err) {}
+    } catch {}
   };
+
+  /* ---------------- LOADING ---------------- */
 
   if (loading) {
     return (
@@ -164,10 +187,12 @@ function ProductDetails() {
     sellerId &&
     String(loggedInId) === String(sellerId);
 
+  /* ================= UI ================= */
+
   return (
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
-        
+
         {/* IMAGE SECTION */}
         <div>
           <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
@@ -184,26 +209,86 @@ function ProductDetails() {
 
         {/* DETAILS SECTION */}
         <div>
-          <span
-            className={`text-sm font-bold uppercase ${getCategoryColor(
-              product.category
-            )}`}
-          >
-            {product.category}
-          </span>
 
-          <h1 className="text-4xl font-bold text-white mt-4">
-            {product.title}
-          </h1>
+          {/* CATEGORY */}
+          {isEditing ? (
+            <select
+              value={editData.category}
+              onChange={(e) =>
+                setEditData({ ...editData, category: e.target.value })
+              }
+              className="bg-slate-950 border border-blue-500 text-white px-4 py-2 rounded-xl"
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span
+              className={`text-sm font-bold uppercase ${getCategoryColor(
+                product.category
+              )}`}
+            >
+              {product.category}
+            </span>
+          )}
 
-          <p className="text-3xl text-white mt-4">
-            ₹{product.price?.toLocaleString("en-IN")}
-          </p>
+          {/* TITLE */}
+          {isEditing ? (
+            <input
+              className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
+              value={editData.title}
+              onChange={(e) =>
+                setEditData({ ...editData, title: e.target.value })
+              }
+            />
+          ) : (
+            <h1 className="text-4xl font-bold text-white mt-4">
+              {product.title}
+            </h1>
+          )}
 
-          <p className="text-slate-300 mt-6 whitespace-pre-wrap">
-            {product.description}
-          </p>
+          {/* PRICE */}
+          {isEditing ? (
+            <input
+              type="number"
+              min="1"
+              className="bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 text-white text-2xl mt-4"
+              value={editData.price}
+              onChange={(e) =>
+                setEditData({
+                  ...editData,
+                  price: Number(e.target.value),
+                })
+              }
+            />
+          ) : (
+            <p className="text-3xl text-white mt-4">
+              ₹{product.price?.toLocaleString("en-IN")}
+            </p>
+          )}
 
+          {/* DESCRIPTION */}
+          {isEditing ? (
+            <textarea
+              className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white mt-6"
+              value={editData.description}
+              onChange={(e) =>
+                setEditData({
+                  ...editData,
+                  description: e.target.value,
+                })
+              }
+            />
+          ) : (
+            <p className="text-slate-300 mt-6 whitespace-pre-wrap">
+              {product.description}
+            </p>
+          )}
+
+          {/* ACTIONS */}
           <div className="mt-8 flex gap-4">
             <button
               onClick={handleContact}
@@ -220,26 +305,49 @@ function ProductDetails() {
             </button>
           </div>
 
+          {/* OWNER CONTROLS */}
           {isOwner && (
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
-              >
-                Edit Listing
-              </button>
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleEdit}
+                    disabled={isUpdating}
+                    className="bg-green-600 px-4 py-2 rounded-xl text-white disabled:opacity-50"
+                  >
+                    {isUpdating ? "Saving..." : "Save"}
+                  </button>
 
-              <button
-                onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded-xl"
-              >
-                Delete
-              </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="bg-slate-700 px-4 py-2 rounded-xl text-white"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
+                  >
+                    Edit Listing
+                  </button>
+
+                  <button
+                    onClick={handleDelete}
+                    className="bg-red-600 text-white px-4 py-2 rounded-xl"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
       </div>
 
+      {/* IMAGE MODAL */}
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black/95 flex items-center justify-center"

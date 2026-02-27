@@ -82,12 +82,12 @@ function Home() {
             {products.length > 0 ? (
               products.map((product) => (
                 <Link to={`/product/${product._id}`} key={product._id} className="group">
-                  <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 flex flex-col h-full shadow-lg">
+                  <div className="bg-slate-900 border border-slate-800 rounded-[2rem] overflow-hidden hover:border-blue-500 duration-300 flex flex-col h-full shadow-lg">
                     <div className="relative aspect-square overflow-hidden">
                       <img 
                         src={product.images[0]} 
                         alt={product.title} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        className="w-full h-full object-cover transition-transform duration-500" 
                       />
                       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white font-bold uppercase tracking-widest">
                         {product.category}

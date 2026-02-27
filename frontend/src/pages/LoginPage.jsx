@@ -21,7 +21,7 @@ function Login() {
       
       alert("Welcome back!");
       navigate('/');
-      window.location.reload(); 
+      window.location.reload(); c
     } catch (err) {
       console.error("Login Error:", err.response?.data);
       alert(err.response?.data?.message || "Invalid Credentials");
