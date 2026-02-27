@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import API from '../api.js';
-import { CATEGORIES } from '../config/constants.js';
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import API from "../api.js";
+import { CATEGORIES } from "../config/constants.js";
+import { toast } from "react-toastify";
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState(null); // ✅ FIXED
   const [mainImg, setMainImg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,7 @@ function ProductDetails() {
   const [editData, setEditData] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem('user')) || null;
+  const user = JSON.parse(localStorage.getItem("user")) || null;
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -31,17 +32,18 @@ function ProductDetails() {
         setMainImg(currentProduct.images?.[0] || "");
 
         const relatedRes = await API.get(
-          `/products/all?category=${encodeURIComponent(currentProduct.category)}`
+          `/products/all?category=${encodeURIComponent(
+            currentProduct.category
+          )}`
         );
 
         const filtered = relatedRes.data.data.filter(
-          item => item._id !== id
+          (item) => item._id !== id
         );
 
         setRelated(filtered.slice(0, 4));
-
       } catch (err) {
-        console.error("Error fetching product:", err);
+        toast.error("Error loading product.");
       } finally {
         setLoading(false);
       }
@@ -51,65 +53,91 @@ function ProductDetails() {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // 🎨 Dynamic Category Colors
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case "Electronics":
+        return "text-blue-500";
+      case "Vehicles":
+        return "text-red-500";
+      case "Furniture":
+        return "text-yellow-500";
+      default:
+        return "text-green-500";
+    }
+  };
+
   const handleInlineUpdate = async () => {
+    if (editData.price < 1) {
+      toast.error("Price must be greater than ₹1");
+      return;
+    }
+
+    if (editData.description.split(" ").length < 10) {
+      toast.error("Description must contain at least 10 words.");
+      return;
+    }
+
     setIsUpdating(true);
     try {
       const res = await API.put(`/products/${id}`, editData);
       setProduct(res.data.data);
       setIsEditing(false);
-      alert("Product updated successfully!");
+      toast.success("Product updated successfully!");
     } catch (err) {
-      alert("Update failed.");
+      toast.error("Update failed.");
     } finally {
       setIsUpdating(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Delete this listing?")) {
-      try {
-        await API.delete(`/products/${id}`);
-        alert("Product deleted!");
-        navigate('/');
-      } catch (err) {
-        alert("Delete failed.");
-      }
+    const confirmDelete = window.confirm("Delete this listing?");
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`/products/${id}`);
+      toast.success("Product deleted!");
+      navigate("/");
+    } catch (err) {
+      toast.error("Delete failed.");
     }
   };
 
-const handleContact = () => {
-  const phoneNumber = product?.phoneNumber || product?.seller?.phone;
+  const handleContact = () => {
+    const phoneNumber =
+      product?.phoneNumber || product?.seller?.phone;
 
-  if (!phoneNumber) {
-    alert("Seller contact information is not available.");
-    return;
-  }
-
-
-  const cleanNumber = phoneNumber.replace(/\D/g, '');
-
-  const message = encodeURIComponent(`Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`);
-
-  window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
-};
-
-const handleShare = async () => {
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: product.title,
-        text: product.description,
-        url: window.location.href,
-      });
-    } else {
-      await navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
+    if (!phoneNumber || phoneNumber.length !== 10) {
+      toast.error("Invalid seller contact number.");
+      return;
     }
-  } catch (err) {
-    console.log("Share cancelled");
-  }
-};
 
+    const cleanNumber = phoneNumber.replace(/\D/g, "");
+    const message = encodeURIComponent(
+      `Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`
+    );
+
+    window.open(
+      `https://wa.me/91${cleanNumber}?text=${message}`,
+      "_blank"
+    );
+  };
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: product.title,
+          text: product.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (err) {}
+  };
 
   if (loading) {
     return (
@@ -132,12 +160,15 @@ const handleShare = async () => {
   const loggedInId = user?.id || user?._id;
   const sellerId = product.seller?._id || product.seller;
   const isOwner =
-    loggedInId && sellerId && String(loggedInId) === String(sellerId);
+    loggedInId &&
+    sellerId &&
+    String(loggedInId) === String(sellerId);
 
   return (
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
-
+        
+        {/* IMAGE SECTION */}
         <div>
           <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
             {mainImg && (
@@ -149,170 +180,63 @@ const handleShare = async () => {
               />
             )}
           </div>
-
-          <div className="flex gap-3 mt-4 overflow-x-auto">
-            {product.images?.map((img) => (
-              <img
-                key={img}
-                src={img}
-                onClick={() => setMainImg(img)}
-                className={`w-20 h-20 object-cover rounded-xl cursor-pointer border-2 ${
-                  mainImg === img
-                    ? "border-blue-500"
-                    : "border-transparent opacity-50 hover:opacity-100"
-                }`}
-              />
-            ))}
-          </div>
         </div>
 
-        <div className="flex flex-col justify-between">
+        {/* DETAILS SECTION */}
+        <div>
+          <span
+            className={`text-sm font-bold uppercase ${getCategoryColor(
+              product.category
+            )}`}
+          >
+            {product.category}
+          </span>
 
-          <div>
-            {isEditing ? (
-              <select
-                value={editData.category}
-                onChange={(e) =>
-                  setEditData({ ...editData, category: e.target.value })
-                }
-                className="bg-slate-950 border border-blue-500 text-white px-4 py-2 rounded-xl"
+          <h1 className="text-4xl font-bold text-white mt-4">
+            {product.title}
+          </h1>
+
+          <p className="text-3xl text-white mt-4">
+            ₹{product.price?.toLocaleString("en-IN")}
+          </p>
+
+          <p className="text-slate-300 mt-6 whitespace-pre-wrap">
+            {product.description}
+          </p>
+
+          <div className="mt-8 flex gap-4">
+            <button
+              onClick={handleContact}
+              className="text-green-500"
+            >
+              Chat via WhatsApp
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="text-slate-300"
+            >
+              Share
+            </button>
+          </div>
+
+          {isOwner && (
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
               >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="text-blue-500 text-sm font-bold uppercase">
-                {product.category}
-              </span>
-            )}
+                Edit Listing
+              </button>
 
-            {isEditing ? (
-              <input
-                className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
-                value={editData.title}
-                onChange={(e) =>
-                  setEditData({ ...editData, title: e.target.value })
-                }
-              />
-            ) : (
-              <h1 className="text-4xl font-bold text-white mt-4">
-                {product.title}
-              </h1>
-            )}
-
-            <div className="mt-4">
-              {isEditing ? (
-                <input
-                  type="number"
-                  className="bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 text-white text-2xl"
-                  value={editData.price}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      price: Number(e.target.value),
-                    })
-                  }
-                />
-              ) : (
-                <p className="text-3xl text-white">
-                  ₹{product.price?.toLocaleString("en-IN")}
-                </p>
-              )}
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-xl"
+              >
+                Delete
+              </button>
             </div>
-
-            <div className="mt-6">
-              <h4 className="text-slate-400 text-xs uppercase mb-2">
-                Description
-              </h4>
-
-              {isEditing ? (
-                <textarea
-                  className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
-                  value={editData.description}
-                  onChange={(e) =>
-                    setEditData({
-                      ...editData,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              ) : (
-                <p className="text-slate-300 whitespace-pre-wrap">
-                  {product.description}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6">
-
-
-<div className="mt-8 p-6 bg-slate-950/50 border border-slate-800 rounded-2xl">
-
-  <div className="flex justify-between items-center mb-4">
-    <div>
-      <p className="text-slate-500 text-xs uppercase mb-1">
-        Seller Information
-      </p>
-
-      <Link to={`/seller/${sellerId}`} className='text-slate-300 font-bold text-lg underline'>
-        {product.seller?.name}
-      </Link>
-    </div>
-
-  </div>
-
-  <div className="flex gap-4 mt-6 flex-wrap">
-    <button onClick={handleContact} className='text-green-500'>
-      Chat via  WhatsApp 
-    </button>
-
-    <button onClick={handleShare} className='text-slate-300'>
-      Share
-    </button>
-  </div>
-
-</div>
-
-
-            {isOwner && (
-              <div className="flex gap-3 mt-4">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={handleInlineUpdate}
-                      className="bg-green-600 text-white px-4 py-2 rounded-xl"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={handleDelete}
-                      className="bg-red-600 text-white px-4 py-2 rounded-xl"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="bg-slate-700 text-white px-4 py-2 rounded-xl"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-yellow-500 text-black px-4 py-2 rounded-xl"
-                  >
-                    Edit Listing
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
+          )}
         </div>
       </div>
 
@@ -324,6 +248,7 @@ const handleShare = async () => {
           <img
             src={mainImg}
             className="max-w-full max-h-full rounded-xl"
+            alt="preview"
           />
         </div>
       )}
