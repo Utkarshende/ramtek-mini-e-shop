@@ -57,25 +57,32 @@ function ProductDetails() {
 
   /* ---------------- VALIDATION ---------------- */
 
-  const validateEditData = () => {
-    if (!editData.title?.trim()) {
-      toast.error("Title is required");
-      return false;
-    }
+ const validateEditData = () => {
+  if (!editData.title?.trim()) {
+    toast.error("Title is required");
+    return false;
+  }
 
-    if (!editData.price || editData.price < 1) {
-      toast.error("Price must be greater than ₹1");
-      return false;
-    }
+  if (!editData.price || editData.price < 1) {
+    toast.error("Price must be greater than ₹1");
+    return false;
+  }
 
-    const wordCount = editData.description?.trim().split(/\s+/).length;
-    if (!editData.description || wordCount < 100) {
-      toast.error("Description must be at least 100 words");
-      return false;
-    }
+  const words = editData.description?.trim().split(/\s+/) || [];
+  const wordCount = words.filter(word => word.length > 0).length;
 
-    return true;
-  };
+  if (wordCount < 10) {
+    toast.error("Description must contain at least 10 words.");
+    return false;
+  }
+
+  if (wordCount > 100) {
+    toast.error("Description cannot exceed 100 words.");
+    return false;
+  }
+
+  return true;
+};
 
   /* ---------------- UPDATE ---------------- */
 
@@ -272,16 +279,26 @@ function ProductDetails() {
 
           {/* DESCRIPTION */}
           {isEditing ? (
-            <textarea
-              className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white mt-6"
-              value={editData.description}
-              onChange={(e) =>
-                setEditData({
-                  ...editData,
-                  description: e.target.value,
-                })
-              }
-            />
+            <div className="mt-6">
+  <textarea
+    maxLength={800} // safety limit (optional)
+    className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
+    value={editData.description}
+    onChange={(e) =>
+      setEditData({
+        ...editData,
+        description: e.target.value,
+      })
+    }
+  />
+
+  {/* Word Counter */}
+  <p className="text-xs text-slate-400 mt-2 text-right">
+    {
+      editData.description?.trim().split(/\s+/).filter(w => w.length > 0).length || 0
+    } / 100 words
+  </p>
+</div>
           ) : (
             <p className="text-slate-300 mt-6 whitespace-pre-wrap">
               {product.description}
