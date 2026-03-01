@@ -11,13 +11,13 @@ function About() {
   const [editingId, setEditingId] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user")) || null;
-  const loggedInId = user?.id || user?._id;
+  const loggedInId = user?._id;
 
   const fetchReviews = async () => {
     try {
       const response = await API.get("/reviews");
       setReviews(response.data.data || []);
-    } catch (err) {
+    } catch {
       toast.error("Failed to fetch reviews");
     }
   };
@@ -30,7 +30,7 @@ function About() {
     e.preventDefault();
 
     if (!user) {
-      toast.error("Please login to leave a review");
+      toast.error("Please login first");
       return;
     }
 
@@ -54,8 +54,8 @@ function About() {
 
       setNewReview("");
       fetchReviews();
-    } catch (err) {
-      toast.error("Action failed.");
+    } catch {
+      toast.error("Action failed");
     } finally {
       setIsLoading(false);
     }
@@ -66,148 +66,109 @@ function About() {
 
     try {
       await API.delete(`/reviews/${id}`);
-      toast.success("Review deleted");
+      toast.success("Deleted");
       fetchReviews();
-    } catch (err) {
-      toast.error("Delete failed.");
+    } catch {
+      toast.error("Delete failed");
     }
-  };
-
-  const handleEdit = (review) => {
-    setEditingId(review._id);
-    setNewReview(review.comment);
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white px-6 py-16">
       <div className="max-w-3xl mx-auto">
 
-        <div className="flex justify-start mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-slate-500 hover:text-blue-500 text-sm flex items-center gap-2 transition-all font-medium group"
-          >
-            <span className="group-hover:-translate-x-1 transition-transform">
-              ←
-            </span>
-            Back to Marketplace
-          </button>
-        </div>
+        <h1 className="text-4xl font-bold mb-10">
+          Community Feedback
+        </h1>
 
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-extrabold mb-6 tracking-tight">
-            About <span className="text-blue-500">Ramtek Bazar</span>
-          </h1>
-        </div>
+        <div className="space-y-4 mb-10">
+          {reviews.length > 0 ? (
+            reviews.map((review) => {
+              const reviewerId = review.user?._id;
+              const isOwner =
+                loggedInId &&
+                reviewerId &&
+                String(loggedInId) === String(reviewerId);
 
-        {/* COMMUNITY FEEDBACK */}
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
-          <h2 className="text-xl font-semibold mb-8">
-            Community Feedback
-          </h2>
+              return (
+                <div
+                  key={review._id}
+                  className="bg-slate-900 p-5 rounded-2xl border border-slate-800"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <Link
+                      to={`/seller/${review.user?._id}`}
+                      className="text-blue-400 font-bold hover:underline"
+                    >
+                      {review.user?.name || "Unknown User"}
+                    </Link>
 
-          <div className="space-y-4 mb-8 max-h-[450px] overflow-y-auto pr-2">
-            {reviews.length > 0 ? (
-              reviews.map((review) => {
-                const reviewerId =
-                  review.user?._id || review.user;
+                    {isOwner && (
+                      <div className="flex gap-4 text-xs">
+                        <button
+                          onClick={() => {
+                            setEditingId(review._id);
+                            setNewReview(review.comment);
+                          }}
+                          className="text-yellow-400"
+                        >
+                          Edit
+                        </button>
 
-                const isReviewOwner =
-                  loggedInId &&
-                  reviewerId &&
-                  String(loggedInId) === String(reviewerId);
-
-                return (
-                  <div
-                    key={review._id}
-                    className="bg-slate-950/50 p-5 rounded-2xl border border-slate-800"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-
-                      {/* ✅ CLICKABLE USER NAME */}
-                      <Link
-                        to={`/seller/${review.user?._id}`}
-                        className="font-bold text-blue-400 text-sm uppercase tracking-wider hover:text-blue-300 transition"
-                      >
-                        {review.user?.name || "Unknown User"}
-                      </Link>
-
-                      {isReviewOwner && (
-                        <div className="flex gap-4 text-[10px] font-black uppercase tracking-widest">
-                          <button
-                            onClick={() => handleEdit(review)}
-                            className="text-yellow-500/80 hover:text-yellow-400"
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            onClick={() => handleDelete(review._id)}
-                            className="text-red-500/80 hover:text-red-400"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-slate-300 text-sm leading-relaxed italic">
-                      "{review.comment}"
-                    </p>
-
-                    {/* Optional: Show member since */}
-                    {review.user?.createdAt && (
-                      <p className="text-slate-500 text-xs mt-2">
-                        Member since{" "}
-                        {new Date(
-                          review.user.createdAt
-                        ).getFullYear()}
-                      </p>
+                        <button
+                          onClick={() =>
+                            handleDelete(review._id)
+                          }
+                          className="text-red-400"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     )}
                   </div>
-                );
-              })
-            ) : (
-              <p className="text-slate-600 text-sm italic text-center py-10">
-                No reviews yet.
-              </p>
-            )}
-          </div>
 
-          {/* REVIEW FORM */}
-          <form
-            onSubmit={postReview}
-            className="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t border-slate-800"
-          >
-            <input
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 text-white"
-              placeholder={
-                user
-                  ? editingId
-                    ? "Editing your review..."
-                    : "Tell the community what you think..."
-                  : "Login to join the conversation"
-              }
-              value={newReview}
-              onChange={(e) =>
-                setNewReview(e.target.value)
-              }
-              disabled={!user || isLoading}
-            />
+                  <p className="text-slate-300 italic">
+                    "{review.comment}"
+                  </p>
 
-            <button
-              type="submit"
-              disabled={!user || isLoading}
-              className="px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white"
-            >
-              {isLoading
-                ? "..."
-                : editingId
-                ? "Update"
-                : "Post"}
-            </button>
-          </form>
+                  <p className="text-slate-500 text-xs mt-2">
+                    Member since{" "}
+                    {new Date(
+                      review.user?.createdAt
+                    ).getFullYear()}
+                  </p>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-slate-500">
+              No reviews yet.
+            </p>
+          )}
         </div>
+
+        <form
+          onSubmit={postReview}
+          className="flex gap-3"
+        >
+          <input
+            className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3"
+            placeholder="Write your feedback..."
+            value={newReview}
+            onChange={(e) =>
+              setNewReview(e.target.value)
+            }
+            disabled={!user || isLoading}
+          />
+
+          <button
+            type="submit"
+            disabled={!user || isLoading}
+            className="bg-blue-600 px-6 py-3 rounded-xl font-bold"
+          >
+            {editingId ? "Update" : "Post"}
+          </button>
+        </form>
       </div>
     </div>
   );

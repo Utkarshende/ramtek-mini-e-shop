@@ -4,12 +4,12 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+/* ===================== GET ALL REVIEWS ===================== */
 router.get("/", async (req, res) => {
   try {
     const reviews = await Review.find()
       .populate("user", "name createdAt")
-      .sort({ createdAt: -1 })
-      .lean();
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -23,6 +23,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+/* ===================== CREATE REVIEW ===================== */
 router.post("/", authMiddleware, async (req, res) => {
   try {
     const { comment } = req.body;
@@ -34,12 +35,10 @@ router.post("/", authMiddleware, async (req, res) => {
       });
     }
 
-    const review = new Review({
+    const review = await Review.create({
       user: req.user._id,
       comment: comment.trim(),
     });
-
-    await review.save();
 
     const populatedReview = await review.populate(
       "user",
@@ -58,28 +57,24 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
+/* ===================== UPDATE REVIEW ===================== */
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
 
-    if (!review) {
+    if (!review)
       return res.status(404).json({
         success: false,
         message: "Review not found",
       });
-    }
 
-    if (review.user.toString() !== req.user._id.toString()) {
+    if (review.user.toString() !== req.user._id.toString())
       return res.status(403).json({
         success: false,
-        message: "Not authorized to edit this review",
+        message: "Not authorized",
       });
-    }
 
-    if (req.body.comment) {
-      review.comment = req.body.comment.trim();
-    }
-
+    review.comment = req.body.comment?.trim() || review.comment;
     await review.save();
 
     const updatedReview = await review.populate(
@@ -87,7 +82,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
       "name createdAt"
     );
 
-    res.status(200).json({
+    res.json({
       success: true,
       data: updatedReview,
     });
@@ -99,29 +94,28 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+/* ===================== DELETE REVIEW ===================== */
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
 
-    if (!review) {
+    if (!review)
       return res.status(404).json({
         success: false,
         message: "Review not found",
       });
-    }
 
-    if (review.user.toString() !== req.user._id.toString()) {
+    if (review.user.toString() !== req.user._id.toString())
       return res.status(403).json({
         success: false,
-        message: "You can only delete your own reviews",
+        message: "Not authorized",
       });
-    }
 
     await review.deleteOne();
 
-    res.status(200).json({
+    res.json({
       success: true,
-      message: "Review deleted successfully",
+      message: "Review deleted",
     });
   } catch (error) {
     res.status(500).json({
