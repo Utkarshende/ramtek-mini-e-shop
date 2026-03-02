@@ -1,15 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { COLORS } from "../config/theme";
 
 function ProductCard({ item }) {
   return (
     <Link to={`/product/${item._id}`}>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+        
+        {/* Image */}
         <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
           {item.image ? (
             <img
               src={item.image}
-              alt={item.title}
+              alt={item.name}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -17,13 +20,14 @@ function ProductCard({ item }) {
           )}
         </div>
 
+        {/* Content */}
         <div className="p-4">
           <h3 className="text-lg font-semibold text-gray-800 truncate">
-            {item.title}
+            {item.name}
           </h3>
 
           <div className="flex justify-between items-center mt-2">
-            <span className="text-xl font-bold text-blue-600">
+            <span className={`text-xl font-bold ${COLORS.primary.replace("bg", "text")}`}>
               ₹{item.price}
             </span>
 
