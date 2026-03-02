@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import API from "../api.js";
 import { useNavigate } from "react-router-dom";
-import InputField from "../components/InputField";
+import InputField from "../components/ui/InputField";
 import { toast } from "react-toastify";
 import { COLORS } from "../config/theme";
 

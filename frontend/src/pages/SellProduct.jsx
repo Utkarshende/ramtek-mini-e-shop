@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api.js";
 import { CATEGORIES } from "../config/constants.js";
-import { COLORS, APP_NAME } from "../config/theme.js";
-import { VALIDATION } from "../utils/validation.js";
-import InputField from "../components/InputField";
-import Label from "../components/Label";
+import InputField from "../components/ui/InputField.jsx";
 
 function SellProduct() {
   const navigate = useNavigate();
@@ -18,19 +15,15 @@ function SellProduct() {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
-    category: CATEGORIES[0],
+    category: "All",
     description: "",
     otherDetails: "",
     location: "",
     phoneNumber: "",
   });
 
-  // ================= HANDLE CHANGE =================
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  /* ---------------- IMAGE HANDLER ---------------- */
 
-  // ================= IMAGE HANDLER =================
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
 
@@ -40,7 +33,6 @@ function SellProduct() {
     }
 
     setFiles([...files, ...selectedFiles]);
-
     const newPreviews = selectedFiles.map((file) =>
       URL.createObjectURL(file)
     );
@@ -53,49 +45,35 @@ function SellProduct() {
     setPreviews(previews.filter((_, i) => i !== index));
   };
 
-  // ================= WORD COUNT =================
-  const getWordCount = (text) =>
-    text.trim().split(/\s+/).filter(Boolean).length;
+  /* ---------------- SUBMIT ---------------- */
 
-  // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const wordCount = getWordCount(formData.description);
+    if (formData.price < 1)
+      return toast.error("Price must be more than ₹1");
 
-    if (Number(formData.price) < VALIDATION.minPrice) {
-      return toast.error(`Price must be more than ₹${VALIDATION.minPrice}`);
-    }
-
-    if (formData.phoneNumber.length !== VALIDATION.maxPhoneDigits) {
+    if (formData.phoneNumber.length !== 10)
       return toast.error("Phone number must be 10 digits");
-    }
 
-    if (wordCount < VALIDATION.minDescriptionWords) {
-      return toast.error(
-        `Description must contain at least ${VALIDATION.minDescriptionWords} words`
-      );
-    }
+    if (formData.description.trim().split(/\s+/).length < 10)
+      return toast.error("Description must contain at least 10 words");
 
-    if (wordCount > VALIDATION.maxDescriptionWords) {
-      return toast.error(
-        `Description must not exceed ${VALIDATION.maxDescriptionWords} words`
-      );
-    }
-
-    if (files.length === 0) {
+    if (files.length === 0)
       return toast.error("Please upload at least one image");
-    }
 
     setIsUploading(true);
 
     try {
       const data = new FormData();
+
       Object.keys(formData).forEach((key) =>
         data.append(key, formData[key])
       );
 
-      files.forEach((file) => data.append("images", file));
+      files.forEach((file) =>
+        data.append("images", file)
+      );
 
       const response = await API.post("/products/create", data);
 
@@ -111,24 +89,23 @@ function SellProduct() {
     }
   };
 
+  /* ================= UI ================= */
+
   return (
     <div className="min-h-screen bg-slate-950 p-6 flex justify-center text-white">
       <form
         onSubmit={handleSubmit}
         className="max-w-2xl w-full bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 shadow-2xl"
       >
-        <div className="border-b border-slate-800 pb-4">
-          <h2 className="text-3xl font-bold">
-            {APP_NAME}
-          </h2>
-          <p className="text-slate-400 text-sm">
-            Sell your items locally.
-          </p>
-        </div>
+        <h2 className="text-3xl font-bold">
+          RAMTEK <span className="text-blue-500">BAZAR</span>
+        </h2>
 
         {/* IMAGE SECTION */}
         <div>
-          <Label text="Product Photos (Max 5)" />
+          <label className="text-sm text-slate-400">
+            Product Photos (Max 5)
+          </label>
 
           <div className="flex flex-wrap gap-4 mt-3">
             <label className="w-24 h-24 bg-slate-800 rounded-xl flex items-center justify-center cursor-pointer">
@@ -161,105 +138,104 @@ function SellProduct() {
           </div>
         </div>
 
-        {/* TITLE */}
-        <div>
-          <Label text="Title" />
-          <InputField
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Item Title"
-            required
-          />
-        </div>
+        {/* FORM FIELDS USING InputField */}
 
-        {/* PRICE */}
-        <div>
-          <Label text="Price (₹)" />
-          <InputField
-            type="number"
-            name="price"
-            min={VALIDATION.minPrice}
-            value={formData.price}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <InputField
+          label="Item Title"
+          name="title"
+          value={formData.title}
+          onChange={(e) =>
+            setFormData({ ...formData, title: e.target.value })
+          }
+          required
+        />
+
+        <InputField
+          label="Price (₹)"
+          name="price"
+          type="number"
+          min="1"
+          value={formData.price}
+          onChange={(e) =>
+            setFormData({ ...formData, price: e.target.value })
+          }
+          required
+        />
+
+        <InputField
+          label="Location"
+          name="location"
+          value={formData.location}
+          onChange={(e) =>
+            setFormData({ ...formData, location: e.target.value })
+          }
+          required
+        />
+
+        <InputField
+          label="Phone Number"
+          name="phoneNumber"
+          maxLength={10}
+          value={formData.phoneNumber}
+          onChange={(e) => {
+            if (/^\d*$/.test(e.target.value)) {
+              setFormData({
+                ...formData,
+                phoneNumber: e.target.value,
+              });
+            }
+          }}
+          required
+        />
+
+        <InputField
+          label="Description"
+          name="description"
+          as="textarea"
+          rows={4}
+          value={formData.description}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              description: e.target.value,
+            })
+          }
+          required
+        />
+
+        <InputField
+          label="Other Details"
+          name="otherDetails"
+          as="textarea"
+          rows={3}
+          value={formData.otherDetails}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              otherDetails: e.target.value,
+            })
+          }
+        />
 
         {/* CATEGORY */}
-        <div>
-          <Label text="Category" />
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200"
-          >
-            {CATEGORIES.map((cat) => (
-              <option key={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* LOCATION */}
-        <div>
-          <Label text="Location" />
-          <InputField
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* PHONE */}
-        <div>
-          <Label text="Phone Number" />
-          <InputField
-            name="phoneNumber"
-            maxLength={VALIDATION.maxPhoneDigits}
-            value={formData.phoneNumber}
-            onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) {
-                handleChange(e);
-              }
-            }}
-            required
-          />
-        </div>
-
-        {/* DESCRIPTION */}
-        <div>
-          <Label text="Description" />
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 h-28 resize-none"
-            required
-          />
-          <p className="text-xs text-slate-400 mt-1">
-            {getWordCount(formData.description)} words
-          </p>
-        </div>
-
-        {/* OTHER DETAILS */}
-        <div>
-          <Label text="Other Details (Optional)" />
-          <textarea
-            name="otherDetails"
-            value={formData.otherDetails}
-            onChange={handleChange}
-            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 h-24 resize-none"
-          />
-        </div>
+        <select
+          value={formData.category}
+          onChange={(e) =>
+            setFormData({ ...formData, category: e.target.value })
+          }
+          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
+        >
+          {CATEGORIES.map((cat) => (
+            <option key={cat}>{cat}</option>
+          ))}
+        </select>
 
         <button
           disabled={isUploading}
           className={`w-full py-4 rounded-xl font-bold ${
             isUploading
               ? "bg-slate-800 text-slate-500"
-              : `${COLORS.primary} hover:${COLORS.primaryHover}`
+              : "bg-blue-600 hover:bg-blue-500"
           }`}
         >
           {isUploading ? "Posting..." : "POST MY AD"}

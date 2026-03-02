@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import API from "../api";
-import InputField from "./InputField";
+import InputField from "./ui/InputField";
 import { COLORS } from "../config/theme";
 import { VALIDATION } from "../utils/validation";
 
