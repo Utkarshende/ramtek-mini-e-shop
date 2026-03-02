@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
-import API from '../api';
+import React, { useState } from "react";
+import API from "../api";
+import InputField from "./InputField";
+import { COLORS } from "../config/theme";
 
-export default function EditProductModal({ product, onClose, onUpdate }) {
+function EditProductModal({ product, onClose, onUpdate }) {
   const [formData, setFormData] = useState({
     name: product.name,
     price: product.price,
     description: product.description,
     category: product.category,
-    image: product.image
   });
+
   const [loading, setLoading] = useState(false);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();l
+    e.preventDefault();
     setLoading(true);
+
     try {
       const res = await API.put(`/products/${product._id}`, formData);
-      onUpdate(res.data.data); 
-      onClose(); 
+      onUpdate(res.data.data);
+      onClose();
     } catch (err) {
-      alert("Update failed. Make sure all fields are valid.");
+      alert("Update failed.");
     } finally {
       setLoading(false);
     }
@@ -29,60 +36,57 @@ export default function EditProductModal({ product, onClose, onUpdate }) {
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-3xl shadow-2xl">
         <h2 className="text-2xl font-bold text-white mb-6">Edit Product</h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-xs text-slate-500 uppercase font-bold ml-1">Product Name</label>
-            <input 
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-all"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              required
-            />
-          </div>
+          <InputField
+            label="Product Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-slate-500 uppercase font-bold ml-1">Price (₹)</label>
-              <input 
-                type="number"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-all"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs text-slate-500 uppercase font-bold ml-1">Category</label>
-              <input 
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-all"
-                value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
-              />
-            </div>
-          </div>
+          <InputField
+            label="Price (₹)"
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            required
+          />
+
+          <InputField
+            label="Category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+          />
 
           <div>
-            <label className="text-xs text-slate-500 uppercase font-bold ml-1">Description</label>
-            <textarea 
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 transition-all h-24"
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              Description
+            </label>
+            <textarea
+              name="description"
               value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              onChange={handleChange}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-700 transition-all"
+              className={`flex-1 px-6 py-3 rounded-xl ${COLORS.secondary} text-white font-bold`}
             >
               Cancel
             </button>
-            <button 
+
+            <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all"
+              className={`flex-1 px-6 py-3 rounded-xl ${COLORS.primary} text-white font-bold`}
             >
               {loading ? "Saving..." : "Save Changes"}
             </button>
@@ -92,3 +96,5 @@ export default function EditProductModal({ product, onClose, onUpdate }) {
     </div>
   );
 }
+
+export default EditProductModal;

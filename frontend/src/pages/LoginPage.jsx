@@ -3,7 +3,7 @@ import API from "../api.js";
 import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 import { toast } from "react-toastify";
-import { COLORS } from "../config/theme"; // 👈 constant colors
+import { COLORS } from "../config/theme";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -52,6 +52,7 @@ function Login() {
             value={formData.email}
             onChange={handleChange}
             placeholder="your@email.com"
+            required
           />
 
           <InputField
@@ -61,13 +62,14 @@ function Login() {
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
+            required
             minLength={6}
           />
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full ${COLORS.primary} hover:${COLORS.primaryHover} text-white font-bold py-3 rounded-xl transition-all ${
+            className={`w-full ${COLORS.primary} text-white font-bold py-3 rounded-xl transition-all ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >

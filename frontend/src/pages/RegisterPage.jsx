@@ -40,11 +40,11 @@ function Register() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <InputField
             label="Full Name"
-            type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             placeholder="Enter your name"
+            required
           />
 
           <InputField
@@ -54,6 +54,7 @@ function Register() {
             value={formData.email}
             onChange={handleChange}
             placeholder="example@ramtek.com"
+            required
           />
 
           <InputField
@@ -63,12 +64,13 @@ function Register() {
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
+            required
             minLength={6}
           />
 
           <button
             type="submit"
-            className={`w-full ${COLORS.primary} hover:${COLORS.primaryHover} text-white font-bold py-3 rounded-xl transition-all`}
+            className={`w-full ${COLORS.primary} text-white font-bold py-3 rounded-xl transition-all`}
           >
             Register Now
           </button>
