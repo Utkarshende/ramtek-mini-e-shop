@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api.js";
 import { CATEGORIES } from "../config/constants.js";
+import { COLORS, APP_NAME } from "../config/theme.js";
+import { VALIDATION } from "../utils/validation.js";
+import InputField from "../components/InputField";
+import Label from "../components/Label";
 
 function SellProduct() {
   const navigate = useNavigate();
@@ -14,12 +18,17 @@ function SellProduct() {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
-    category: "All",
+    category: CATEGORIES[0],
     description: "",
     otherDetails: "",
     location: "",
     phoneNumber: "",
   });
+
+  // ================= HANDLE CHANGE =================
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   // ================= IMAGE HANDLER =================
   const handleImageChange = (e) => {
@@ -44,23 +53,34 @@ function SellProduct() {
     setPreviews(previews.filter((_, i) => i !== index));
   };
 
+  // ================= WORD COUNT =================
+  const getWordCount = (text) =>
+    text.trim().split(/\s+/).filter(Boolean).length;
+
   // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Price validation
-    if (formData.price < 1) {
-      return toast.error("Price must be more than ₹1");
+    const wordCount = getWordCount(formData.description);
+
+    if (Number(formData.price) < VALIDATION.minPrice) {
+      return toast.error(`Price must be more than ₹${VALIDATION.minPrice}`);
     }
 
-    // ✅ Phone validation
-    if (formData.phoneNumber.length !== 10) {
+    if (formData.phoneNumber.length !== VALIDATION.maxPhoneDigits) {
       return toast.error("Phone number must be 10 digits");
     }
 
-    // ✅ Description word limit
-    if (formData.description.trim().split(" ").length < 10) {
-      return toast.error("Description must contain at least 10 words");
+    if (wordCount < VALIDATION.minDescriptionWords) {
+      return toast.error(
+        `Description must contain at least ${VALIDATION.minDescriptionWords} words`
+      );
+    }
+
+    if (wordCount > VALIDATION.maxDescriptionWords) {
+      return toast.error(
+        `Description must not exceed ${VALIDATION.maxDescriptionWords} words`
+      );
     }
 
     if (files.length === 0) {
@@ -80,10 +100,8 @@ function SellProduct() {
       const response = await API.post("/products/create", data);
 
       toast.success("Product listed successfully!");
-
       navigate(`/product/${response.data.data._id}`);
     } catch (err) {
-      console.error("Upload Error:", err.response?.data);
       toast.error(
         err.response?.data?.message ||
           "Upload failed. Please check all fields."
@@ -101,7 +119,7 @@ function SellProduct() {
       >
         <div className="border-b border-slate-800 pb-4">
           <h2 className="text-3xl font-bold">
-            RAMTEK <span className="text-blue-500">BAZAR</span>
+            {APP_NAME}
           </h2>
           <p className="text-slate-400 text-sm">
             Sell your items locally.
@@ -110,9 +128,7 @@ function SellProduct() {
 
         {/* IMAGE SECTION */}
         <div>
-          <label className="text-sm text-slate-400">
-            Product Photos (Max 5)
-          </label>
+          <Label text="Product Photos (Max 5)" />
 
           <div className="flex flex-wrap gap-4 mt-3">
             <label className="w-24 h-24 bg-slate-800 rounded-xl flex items-center justify-center cursor-pointer">
@@ -146,100 +162,104 @@ function SellProduct() {
         </div>
 
         {/* TITLE */}
-        <input
-          type="text"
-          placeholder="Item Title"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-          required
-          onChange={(e) =>
-            setFormData({ ...formData, title: e.target.value })
-          }
-        />
+        <div>
+          <Label text="Title" />
+          <InputField
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Item Title"
+            required
+          />
+        </div>
 
         {/* PRICE */}
-        <input
-          type="number"
-          min="1"
-          placeholder="Price (₹)"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-          required
-          onChange={(e) =>
-            setFormData({ ...formData, price: e.target.value })
-          }
-        />
+        <div>
+          <Label text="Price (₹)" />
+          <InputField
+            type="number"
+            name="price"
+            min={VALIDATION.minPrice}
+            value={formData.price}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         {/* CATEGORY */}
-        <select
-          value={formData.category}
-          onChange={(e) =>
-            setFormData({ ...formData, category: e.target.value })
-          }
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat}>{cat}</option>
-          ))}
-        </select>
+        <div>
+          <Label text="Category" />
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
 
         {/* LOCATION */}
-        <input
-          type="text"
-          placeholder="Location"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-          required
-          onChange={(e) =>
-            setFormData({ ...formData, location: e.target.value })
-          }
-        />
+        <div>
+          <Label text="Location" />
+          <InputField
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         {/* PHONE */}
-        <input
-          type="text"
-          maxLength={10}
-          placeholder="Phone Number"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-          required
-          onChange={(e) => {
-            if (/^\d*$/.test(e.target.value)) {
-              setFormData({
-                ...formData,
-                phoneNumber: e.target.value,
-              });
-            }
-          }}
-        />
+        <div>
+          <Label text="Phone Number" />
+          <InputField
+            name="phoneNumber"
+            maxLength={VALIDATION.maxPhoneDigits}
+            value={formData.phoneNumber}
+            onChange={(e) => {
+              if (/^\d*$/.test(e.target.value)) {
+                handleChange(e);
+              }
+            }}
+            required
+          />
+        </div>
 
         {/* DESCRIPTION */}
-        <textarea
-          placeholder="Description (min 10 words)"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl h-28 resize-none"
-          required
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              description: e.target.value,
-            })
-          }
-        />
+        <div>
+          <Label text="Description" />
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 h-28 resize-none"
+            required
+          />
+          <p className="text-xs text-slate-400 mt-1">
+            {getWordCount(formData.description)} words
+          </p>
+        </div>
 
         {/* OTHER DETAILS */}
-        <textarea
-          placeholder="Other Details (Optional)"
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl h-24 resize-none"
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              otherDetails: e.target.value,
-            })
-          }
-        />
+        <div>
+          <Label text="Other Details (Optional)" />
+          <textarea
+            name="otherDetails"
+            value={formData.otherDetails}
+            onChange={handleChange}
+            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 h-24 resize-none"
+          />
+        </div>
 
         <button
           disabled={isUploading}
           className={`w-full py-4 rounded-xl font-bold ${
             isUploading
               ? "bg-slate-800 text-slate-500"
-              : "bg-blue-600 hover:bg-blue-500"
+              : `${COLORS.primary} hover:${COLORS.primaryHover}`
           }`}
         >
           {isUploading ? "Posting..." : "POST MY AD"}
