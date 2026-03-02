@@ -3,15 +3,13 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import API from "../api.js";
 import { CATEGORIES } from "../config/constants.js";
 import { toast } from "react-toastify";
-import ImageSlider from "../components/ImageSlider.jsx";  
+import ImageSlider from "../components/ImageSlider.jsx";
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
-  const [mainImg, setMainImg] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -20,16 +18,16 @@ function ProductDetails() {
 
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
+  /* ---------------- FETCH PRODUCT ---------------- */
+
   useEffect(() => {
     const fetchProduct = async () => {
-      setLoading(true);
       try {
         const { data } = await API.get(`/products/${id}`);
         const currentProduct = data.data;
 
         setProduct(currentProduct);
         setEditData(currentProduct);
-        setMainImg(currentProduct.images?.[0] || "");
       } catch (err) {
         toast.error("Error loading product.");
       } finally {
@@ -43,47 +41,44 @@ function ProductDetails() {
 
   /* ---------------- CATEGORY COLOR ---------------- */
 
-  const getCategoryColor = (category) => {
-    switch (category) {
-      case "Electronics":
-        return "text-blue-500";
-      case "Vehicles":
-        return "text-red-500";
-      case "Furniture":
-        return "text-yellow-500";
-      default:
-        return "text-green-500";
-    }
+  const CATEGORY_COLORS = {
+    Electronics: "text-blue-500",
+    Vehicles: "text-red-500",
+    Furniture: "text-yellow-500",
+    default: "text-green-500",
   };
+
+  const getCategoryColor = (category) =>
+    CATEGORY_COLORS[category] || CATEGORY_COLORS.default;
 
   /* ---------------- VALIDATION ---------------- */
 
- const validateEditData = () => {
-  if (!editData.title?.trim()) {
-    toast.error("Title is required");
-    return false;
-  }
+  const validateEditData = () => {
+    if (!editData.title?.trim()) {
+      toast.error("Title is required");
+      return false;
+    }
 
-  if (!editData.price || editData.price < 1) {
-    toast.error("Price must be greater than ₹1");
-    return false;
-  }
+    if (!editData.price || editData.price < 1) {
+      toast.error("Price must be greater than ₹1");
+      return false;
+    }
 
-  const words = editData.description?.trim().split(/\s+/) || [];
-  const wordCount = words.filter(word => word.length > 0).length;
+    const wordCount =
+      editData.description?.trim().split(/\s+/).filter(Boolean).length || 0;
 
-  if (wordCount < 10) {
-    toast.error("Description must contain at least 10 words.");
-    return false;
-  }
+    if (wordCount < 10) {
+      toast.error("Description must contain at least 10 words.");
+      return false;
+    }
 
-  if (wordCount > 100) {
-    toast.error("Description cannot exceed 100 words.");
-    return false;
-  }
+    if (wordCount > 100) {
+      toast.error("Description cannot exceed 100 words.");
+      return false;
+    }
 
-  return true;
-};
+    return true;
+  };
 
   /* ---------------- UPDATE ---------------- */
 
@@ -102,7 +97,6 @@ function ProductDetails() {
 
       setProduct(res.data.data);
       setIsEditing(false);
-
       toast.success("Product updated successfully!");
     } catch (err) {
       toast.error(
@@ -134,12 +128,12 @@ function ProductDetails() {
     const phoneNumber =
       product?.phoneNumber || product?.seller?.phone;
 
-    if (!phoneNumber || phoneNumber.length !== 10) {
+    const cleanNumber = phoneNumber?.replace(/\D/g, "");
+
+    if (!cleanNumber || cleanNumber.length !== 10) {
       toast.error("Invalid seller contact number.");
       return;
     }
-
-    const cleanNumber = phoneNumber.replace(/\D/g, "");
 
     const message = encodeURIComponent(
       `Hi, I'm interested in your listing: ${product.title} on Ramtek Bazar.`
@@ -174,7 +168,7 @@ function ProductDetails() {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-blue-500 text-xl font-bold animate-pulse">
-          LOADING...
+          Loading...
         </div>
       </div>
     );
@@ -188,27 +182,28 @@ function ProductDetails() {
     );
   }
 
-  const loggedInId = user?.id || user?._id;
+  /* ---------------- OWNER CHECK ---------------- */
+
+  const loggedInId = user?._id ?? user?.id;
   const sellerId = product.seller?._id || product.seller;
+
   const isOwner =
     loggedInId &&
     sellerId &&
     String(loggedInId) === String(sellerId);
 
-  /* ================= UI ================= */
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
 
-        {/* IMAGE SECTION */}
-        <div>
-          <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
-  <ImageSlider images={product.images} className="h-full" />
-</div>
+        {/* IMAGE */}
+        <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
+          <ImageSlider images={product.images} />
         </div>
 
-        {/* DETAILS SECTION */}
+        {/* DETAILS */}
         <div>
 
           {/* CATEGORY */}
@@ -267,43 +262,44 @@ function ProductDetails() {
             />
           ) : (
             <p className="text-3xl text-white mt-4">
-              ₹{product.price?.toLocaleString("en-IN")}
+              {new Intl.NumberFormat("en-IN", {
+                style: "currency",
+                currency: "INR",
+                maximumFractionDigits: 0,
+              }).format(product.price)}
             </p>
           )}
 
+          {/* SELLER */}
           <div className="mt-6">
-  <p className="text-slate-400 text-sm">Seller</p>
+            <p className="text-slate-400 text-sm">Seller</p>
 
-  <Link
-    to={`/seller/${product.seller?._id || product.seller}`}
-    className="text-blue-400 font-semibold hover:underline"
-  >
-    {product.seller?.name || "View Seller Profile"}
-  </Link>
-</div>
+            <Link
+              to={`/seller/${sellerId}`}
+              className="text-blue-400 font-semibold hover:underline"
+            >
+              {product.seller?.name || "View Seller Profile"}
+            </Link>
+          </div>
 
           {/* DESCRIPTION */}
           {isEditing ? (
             <div className="mt-6">
-  <textarea
-    maxLength={800} // safety limit (optional)
-    className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
-    value={editData.description}
-    onChange={(e) =>
-      setEditData({
-        ...editData,
-        description: e.target.value,
-      })
-    }
-  />
-
-  {/* Word Counter */}
-  <p className="text-xs text-slate-400 mt-2 text-right">
-    {
-      editData.description?.trim().split(/\s+/).filter(w => w.length > 0).length || 0
-    } / 100 words
-  </p>
-</div>
+              <textarea
+                maxLength={800}
+                className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-3 text-white"
+                value={editData.description}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    description: e.target.value,
+                  })
+                }
+              />
+              <p className="text-xs text-slate-400 mt-2 text-right">
+                {editData.description?.trim().split(/\s+/).filter(Boolean).length || 0} / 100 words
+              </p>
+            </div>
           ) : (
             <p className="text-slate-300 mt-6 whitespace-pre-wrap">
               {product.description}
@@ -311,17 +307,17 @@ function ProductDetails() {
           )}
 
           {/* ACTIONS */}
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex gap-6">
             <button
               onClick={handleContact}
-              className="text-green-500"
+              className="text-green-500 font-semibold"
             >
               Chat via WhatsApp
             </button>
 
             <button
               onClick={handleShare}
-              className="text-slate-300"
+              className="text-slate-300 font-semibold"
             >
               Share
             </button>
@@ -366,22 +362,9 @@ function ProductDetails() {
               )}
             </div>
           )}
+
         </div>
       </div>
-
-      {/* IMAGE MODAL */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/95 flex items-center justify-center"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <img
-            src={mainImg}
-            className="max-w-full max-h-full rounded-xl"
-            alt="preview"
-          />
-        </div>
-      )}
     </div>
   );
 }

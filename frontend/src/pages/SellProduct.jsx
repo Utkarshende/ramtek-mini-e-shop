@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api.js";
@@ -15,12 +15,20 @@ function SellProduct() {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
-    category: "All",
+    category: CATEGORIES[0] || "Electronics",
     description: "",
     otherDetails: "",
     location: "",
     phoneNumber: "",
   });
+
+  /* ---------------- CLEANUP PREVIEWS ---------------- */
+
+  useEffect(() => {
+    return () => {
+      previews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previews]);
 
   /* ---------------- IMAGE HANDLER ---------------- */
 
@@ -32,17 +40,45 @@ function SellProduct() {
       return;
     }
 
-    setFiles([...files, ...selectedFiles]);
     const newPreviews = selectedFiles.map((file) =>
       URL.createObjectURL(file)
     );
-    setPreviews([...previews, ...newPreviews]);
+
+    setFiles((prev) => [...prev, ...selectedFiles]);
+    setPreviews((prev) => [...prev, ...newPreviews]);
   };
 
   const removeImage = (index) => {
     URL.revokeObjectURL(previews[index]);
-    setFiles(files.filter((_, i) => i !== index));
-    setPreviews(previews.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  /* ---------------- VALIDATION ---------------- */
+
+  const validateForm = () => {
+    if (!formData.title.trim())
+      return "Title is required";
+
+    if (!formData.price || Number(formData.price) < 1)
+      return "Price must be more than ₹1";
+
+    if (!/^\d{10}$/.test(formData.phoneNumber))
+      return "Phone number must be exactly 10 digits";
+
+    const wordCount =
+      formData.description.trim().split(/\s+/).filter(Boolean).length;
+
+    if (wordCount < 10)
+      return "Description must contain at least 10 words";
+
+    if (!formData.location.trim())
+      return "Location is required";
+
+    if (files.length === 0)
+      return "Please upload at least one image";
+
+    return null;
   };
 
   /* ---------------- SUBMIT ---------------- */
@@ -50,30 +86,23 @@ function SellProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.price < 1)
-      return toast.error("Price must be more than ₹1");
-
-    if (formData.phoneNumber.length !== 10)
-      return toast.error("Phone number must be 10 digits");
-
-    if (formData.description.trim().split(/\s+/).length < 10)
-      return toast.error("Description must contain at least 10 words");
-
-    if (files.length === 0)
-      return toast.error("Please upload at least one image");
+    const error = validateForm();
+    if (error) return toast.error(error);
 
     setIsUploading(true);
 
     try {
       const data = new FormData();
 
-      Object.keys(formData).forEach((key) =>
-        data.append(key, formData[key])
-      );
+      data.append("title", formData.title.trim());
+      data.append("price", Number(formData.price));
+      data.append("category", formData.category);
+      data.append("description", formData.description.trim());
+      data.append("otherDetails", formData.otherDetails.trim());
+      data.append("location", formData.location.trim());
+      data.append("phoneNumber", formData.phoneNumber);
 
-      files.forEach((file) =>
-        data.append("images", file)
-      );
+      files.forEach((file) => data.append("images", file));
 
       const response = await API.post("/products/create", data);
 
@@ -108,7 +137,7 @@ function SellProduct() {
           </label>
 
           <div className="flex flex-wrap gap-4 mt-3">
-            <label className="w-24 h-24 bg-slate-800 rounded-xl flex items-center justify-center cursor-pointer">
+            <label className="w-24 h-24 bg-slate-800 rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-700 transition">
               <span className="text-2xl text-slate-400">+</span>
               <input
                 type="file"
@@ -138,7 +167,7 @@ function SellProduct() {
           </div>
         </div>
 
-        {/* FORM FIELDS USING InputField */}
+        {/* FORM FIELDS */}
 
         <InputField
           label="Item Title"
@@ -218,21 +247,28 @@ function SellProduct() {
         />
 
         {/* CATEGORY */}
-        <select
-          value={formData.category}
-          onChange={(e) =>
-            setFormData({ ...formData, category: e.target.value })
-          }
-          className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat}>{cat}</option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-semibold text-slate-300 mb-2">
+            Category
+          </label>
+          <select
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <button
           disabled={isUploading}
-          className={`w-full py-4 rounded-xl font-bold ${
+          className={`w-full py-4 rounded-xl font-bold transition ${
             isUploading
               ? "bg-slate-800 text-slate-500"
               : "bg-blue-600 hover:bg-blue-500"

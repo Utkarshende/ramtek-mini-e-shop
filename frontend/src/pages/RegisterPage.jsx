@@ -4,32 +4,48 @@ import { useNavigate } from "react-router-dom";
 import InputField from "../components/ui/InputField";
 import { toast } from "react-toastify";
 import { COLORS } from "../config/theme";
+import { MESSAGES } from "../config/messages";
+import { VALIDATION } from "../utils/validation";
 
 function Register() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
+  /* ---------------- HANDLE CHANGE ---------------- */
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
+  /* ---------------- HANDLE SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const { data } = await API.post("/auth/register", formData);
-      toast.success(data.message);
+
+      toast.success(data?.message || MESSAGES.registerSuccess);
       navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      toast.error(
+        err?.response?.data?.message || MESSAGES.registerError
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md w-full bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
@@ -38,6 +54,7 @@ function Register() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
           <InputField
             label="Full Name"
             name="name"
@@ -65,15 +82,19 @@ function Register() {
             onChange={handleChange}
             placeholder="••••••••"
             required
-            minLength={6}
+            minLength={VALIDATION.minPasswordLength}
           />
 
           <button
             type="submit"
-            className={`w-full ${COLORS.primary} text-white font-bold py-3 rounded-xl transition-all`}
+            disabled={loading}
+            className={`w-full ${COLORS.primary} text-white font-bold py-3 rounded-xl transition-all ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Register Now
+            {loading ? "Registering..." : "Register Now"}
           </button>
+
         </form>
 
         <p className="text-slate-500 text-center mt-6 text-sm">

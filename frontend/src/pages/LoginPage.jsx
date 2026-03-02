@@ -4,20 +4,27 @@ import { useNavigate } from "react-router-dom";
 import InputField from "../components/ui/InputField";
 import { toast } from "react-toastify";
 import { COLORS } from "../config/theme";
-
+import { MESSAGES } from "../config/messages";
+import { VALIDATIONr } from "../utils/validation.js";
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
+  /* ---------------- HANDLE CHANGE ---------------- */
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
+  /* ---------------- HANDLE SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -25,18 +32,21 @@ function Login() {
     try {
       const { data } = await API.post("/auth/login", formData);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data?.token);
+      localStorage.setItem("user", JSON.stringify(data?.user));
 
-      toast.success("Welcome back 🎉");
+      toast.success(MESSAGES.loginSuccess);
       navigate("/");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Invalid Credentials");
+      toast.error(
+        err?.response?.data?.message || MESSAGES.loginError
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md w-full bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
@@ -45,6 +55,7 @@ function Login() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
           <InputField
             label="Email"
             type="email"
@@ -63,7 +74,7 @@ function Login() {
             onChange={handleChange}
             placeholder="••••••••"
             required
-            minLength={6}
+            minLength={VALIDATION.minPasswordLength}
           />
 
           <button
@@ -75,6 +86,7 @@ function Login() {
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>
+
         </form>
 
         <p className="text-slate-500 text-center mt-6 text-sm">

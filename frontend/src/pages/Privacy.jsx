@@ -1,64 +1,97 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import Container from "../components/common/Container";
+import BackButton from "../components/common/BackButton";
+import PageHeader from "../components/common/PageHeader";
 
 function Privacy() {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-slate-950 text-white px-6 py-16 flex flex-col items-center">
-      <div className="max-w-3xl w-full">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="text-slate-500 hover:text-blue-500 text-sm mb-8 flex items-center gap-2 transition-colors"
-        >
-          ← Back
-        </button>
+    <Container>
+      <div className="max-w-3xl mx-auto py-16">
 
-        <h1 className="text-4xl font-bold mb-8 tracking-tight">
-          Privacy <span className="text-blue-500">Policy</span>
-        </h1>
+        {/* Back Button */}
+        <BackButton />
 
-        <div className="space-y-8 text-slate-400 leading-relaxed">
+        {/* Page Header */}
+        <PageHeader
+          title="Privacy"
+          highlight="Policy"
+          subtitle="Your data matters to us at Ramtek Bazar."
+        />
+
+        {/* Content */}
+        <div className="space-y-10 text-slate-400 leading-relaxed mt-12">
+
+          {/* Section 1 */}
           <section>
-            <h2 className="text-xl font-bold text-slate-200 mb-3">1. Information We Collect</h2>
+            <h2 className="text-xl font-semibold text-slate-200 mb-3">
+              1. Information We Collect
+            </h2>
             <p>
-              We collect basic information required to list your products, such as your name, 
-              phone number, and product images. Your phone number is made public so that 
-              potential buyers can contact you via WhatsApp or Call.
+              We collect basic information required to list your products,
+              such as your name, phone number, product details, and images.
+              Your phone number may be visible to buyers so they can contact
+              you directly via call or WhatsApp.
             </p>
           </section>
 
+          {/* Section 2 */}
           <section>
-            <h2 className="text-xl font-bold text-slate-200 mb-3">2. How We Use Data</h2>
+            <h2 className="text-xl font-semibold text-slate-200 mb-3">
+              2. How We Use Your Data
+            </h2>
             <p>
-              Your data is used solely to display your listings on **Ramtek Bazar**. We do not 
-              sell, trade, or share your personal information with third-party marketing companies.
+              Your data is used only to display your listings on Ramtek Bazar.
+              We do not sell, rent, or trade your personal information to
+              third-party marketing companies.
             </p>
           </section>
 
+          {/* Section 3 */}
           <section>
-            <h2 className="text-xl font-bold text-slate-200 mb-3">3. Image Storage</h2>
+            <h2 className="text-xl font-semibold text-slate-200 mb-3">
+              3. Image Storage
+            </h2>
             <p>
-              Product images are securely stored on **Cloudinary**. By uploading an image, 
-              you confirm that you have the right to share that content publicly.
+              Product images are securely stored using Cloudinary. By uploading
+              content, you confirm that you have the right to share the images
+              publicly.
             </p>
           </section>
 
+          {/* Section 4 */}
+          <section>
+            <h2 className="text-xl font-semibold text-slate-200 mb-3">
+              4. Data Security
+            </h2>
+            <p>
+              We implement reasonable security practices to protect your
+              information. However, as an online platform, we cannot guarantee
+              absolute security of data transmission over the internet.
+            </p>
+          </section>
+
+          {/* Highlight Box */}
           <section className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-            <h2 className="text-lg font-bold text-blue-400 mb-2">User Responsibility</h2>
-            <p className="text-sm">
-              As a hyper-local marketplace, users are responsible for the safety of their 
-              transactions. Always meet in public places (like near the Ramtek Bus Stand) 
-              when exchanging goods.
+            <h2 className="text-lg font-semibold text-blue-400 mb-2">
+              User Responsibility
+            </h2>
+            <p className="text-sm text-slate-300">
+              Ramtek Bazar is a hyper-local marketplace. Users are responsible
+              for verifying buyers and sellers before transactions. Always meet
+              in safe public locations and avoid advance payments to unknown
+              individuals.
             </p>
           </section>
+
         </div>
 
-        <p className="mt-12 text-xs text-slate-600 italic">
+        {/* Footer Note */}
+        <p className="mt-14 text-xs text-slate-600 italic">
           Last Updated: February 2026
         </p>
+
       </div>
-    </div>
+    </Container>
   );
 }
 
