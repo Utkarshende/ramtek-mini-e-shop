@@ -12,7 +12,7 @@ export default function EditProductModal({ product, onClose, onUpdate }) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();l
     setLoading(true);
     try {
       const res = await API.put(`/products/${product._id}`, formData);

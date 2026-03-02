@@ -3,6 +3,7 @@ import API from "../api.js";
 import { useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 import { toast } from "react-toastify";
+import { COLORS } from "../config/theme"; // 👈 constant colors
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -39,11 +40,11 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md w-full bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
-        <h2 className="text-3xl font-bold text-white mb-6 text-center tracking-tight">
+        <h2 className="text-3xl font-bold text-white mb-6 text-center">
           Welcome Back
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4  ">
-        
+
+        <form onSubmit={handleSubmit} className="space-y-5">
           <InputField
             label="Email"
             type="email"
@@ -51,8 +52,8 @@ function Login() {
             value={formData.email}
             onChange={handleChange}
             placeholder="your@email.com"
-
           />
+
           <InputField
             label="Password"
             type="password"
@@ -60,12 +61,13 @@ function Login() {
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-          />          
+            minLength={6}
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl mt-4 shadow-lg shadow-blue-900/20 transition-all active:scale-95 ${
+            className={`w-full ${COLORS.primary} hover:${COLORS.primaryHover} text-white font-bold py-3 rounded-xl transition-all ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -73,7 +75,7 @@ function Login() {
           </button>
         </form>
 
-        <p className="text-slate-500 text-center mt-6 text-sm font-medium">
+        <p className="text-slate-500 text-center mt-6 text-sm">
           Don't have an account?{" "}
           <span
             onClick={() => navigate("/register")}

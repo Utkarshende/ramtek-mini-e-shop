@@ -1,6 +1,5 @@
 export const APP_NAME = "Ramtek Bazar";
-
-export const THEME = {
-  primary: "text-blue-500",
-  primaryBg: "bg-blue-600",
+export const COLORS = {
+  primary: "bg-blue-600",
+  primaryHover: "bg-blue-700",
 };
