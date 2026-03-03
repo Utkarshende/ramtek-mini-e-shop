@@ -8,7 +8,6 @@ function Contact() {
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-12">
       <div className="max-w-xl w-full bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl relative">
 
-        {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
           className="absolute top-6 left-6 text-slate-500 hover:text-blue-500 text-xs uppercase tracking-widest transition"
@@ -26,10 +25,8 @@ function Contact() {
             We’d love to hear from you.
           </p>
 
-          {/* CONTACT OPTIONS */}
           <div className="space-y-4">
 
-            {/* EMAIL */}
             <a
               href="mailto:support@ramtekbazar.com"
               className="flex items-center justify-between p-5 bg-slate-950 rounded-2xl border border-slate-800 hover:border-blue-500 hover:bg-slate-900 transition-all group"
@@ -43,7 +40,6 @@ function Contact() {
               </span>
             </a>
 
-            {/* LOCATION */}
             <div className="flex items-center justify-between p-5 bg-slate-950 rounded-2xl border border-slate-800">
               <span className="text-slate-400">
                 Headquarters
@@ -55,7 +51,6 @@ function Contact() {
             </div>
           </div>
 
-          {/* FOOTER */}
           <p className="mt-12 text-[10px] text-slate-600 uppercase tracking-[0.3em]">
             Developed by Ramtek Dev Team
           </p>

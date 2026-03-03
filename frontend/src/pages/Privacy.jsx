@@ -8,20 +8,16 @@ function Privacy() {
     <Container>
       <div className="max-w-3xl mx-auto py-16">
 
-        {/* Back Button */}
         <BackButton />
 
-        {/* Page Header */}
         <PageHeader
           title="Privacy"
           highlight="Policy"
           subtitle="Your data matters to us at Ramtek Bazar."
         />
 
-        {/* Content */}
         <div className="space-y-10 text-slate-400 leading-relaxed mt-12">
 
-          {/* Section 1 */}
           <section>
             <h2 className="text-xl font-semibold text-slate-200 mb-3">
               1. Information We Collect
@@ -34,7 +30,6 @@ function Privacy() {
             </p>
           </section>
 
-          {/* Section 2 */}
           <section>
             <h2 className="text-xl font-semibold text-slate-200 mb-3">
               2. How We Use Your Data
@@ -46,7 +41,6 @@ function Privacy() {
             </p>
           </section>
 
-          {/* Section 3 */}
           <section>
             <h2 className="text-xl font-semibold text-slate-200 mb-3">
               3. Image Storage
@@ -58,7 +52,6 @@ function Privacy() {
             </p>
           </section>
 
-          {/* Section 4 */}
           <section>
             <h2 className="text-xl font-semibold text-slate-200 mb-3">
               4. Data Security
@@ -70,7 +63,6 @@ function Privacy() {
             </p>
           </section>
 
-          {/* Highlight Box */}
           <section className="bg-slate-900 p-6 rounded-2xl border border-slate-800">
             <h2 className="text-lg font-semibold text-blue-400 mb-2">
               User Responsibility
@@ -85,7 +77,6 @@ function Privacy() {
 
         </div>
 
-        {/* Footer Note */}
         <p className="mt-14 text-xs text-slate-600 italic">
           Last Updated: February 2026
         </p>

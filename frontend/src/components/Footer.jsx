@@ -6,10 +6,8 @@ function Footer() {
     <footer className="bg-slate-950 border-t border-slate-900 mt-20">
       <div className="max-w-6xl mx-auto px-6 py-12">
 
-        {/* Top Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
-          {/* Branding */}
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-white">
               Ramtek <span className="text-blue-500">Bazar</span>
@@ -19,7 +17,6 @@ function Footer() {
             </p>
           </div>
 
-          {/* Navigation Links */}
           <div className="flex gap-8 text-sm font-medium text-slate-400">
             <Link
               to="/about"
@@ -44,10 +41,8 @@ function Footer() {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="border-t border-slate-900 my-8"></div>
 
-        {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
 
           <p>

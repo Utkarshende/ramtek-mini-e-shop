@@ -18,7 +18,6 @@ function Register() {
 
   const [loading, setLoading] = useState(false);
 
-  /* ---------------- HANDLE CHANGE ---------------- */
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -26,7 +25,6 @@ function Register() {
     }));
   };
 
-  /* ---------------- HANDLE SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -45,7 +43,6 @@ function Register() {
     }
   };
 
-  /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <div className="max-w-md w-full bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">

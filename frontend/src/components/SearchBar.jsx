@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 
 function SearchBar({ searchQuery, setSearchQuery }) {
-  // 🔥 Keyboard shortcut: press "/" to focus search
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
@@ -19,14 +18,12 @@ function SearchBar({ searchQuery, setSearchQuery }) {
     <div className="w-full max-w-2xl mx-auto mb-10">
       <div className="relative group">
         
-        {/* Search Icon */}
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <span className="text-slate-400 group-focus-within:text-blue-500 transition-colors">
             🔍
           </span>
         </div>
 
-        {/* Input */}
         <input
           id="global-search"
           type="text"
@@ -36,7 +33,6 @@ function SearchBar({ searchQuery, setSearchQuery }) {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
-        {/* Shortcut Hint */}
         <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
           <span className="hidden md:block text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-md border border-slate-700">
             Press /

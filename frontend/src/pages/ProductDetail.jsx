@@ -18,7 +18,6 @@ function ProductDetails() {
 
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
-  /* ---------------- FETCH PRODUCT ---------------- */
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -39,7 +38,6 @@ function ProductDetails() {
     window.scrollTo(0, 0);
   }, [id]);
 
-  /* ---------------- CATEGORY COLOR ---------------- */
 
   const CATEGORY_COLORS = {
     Electronics: "text-blue-500",
@@ -51,7 +49,6 @@ function ProductDetails() {
   const getCategoryColor = (category) =>
     CATEGORY_COLORS[category] || CATEGORY_COLORS.default;
 
-  /* ---------------- VALIDATION ---------------- */
 
   const validateEditData = () => {
     if (!editData.title?.trim()) {
@@ -80,7 +77,6 @@ function ProductDetails() {
     return true;
   };
 
-  /* ---------------- UPDATE ---------------- */
 
   const handleEdit = async () => {
     if (!validateEditData()) return;
@@ -107,7 +103,6 @@ function ProductDetails() {
     }
   };
 
-  /* ---------------- DELETE ---------------- */
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm("Delete this listing?");
@@ -122,7 +117,6 @@ function ProductDetails() {
     }
   };
 
-  /* ---------------- CONTACT ---------------- */
 
   const handleContact = () => {
     const phoneNumber =
@@ -145,7 +139,6 @@ function ProductDetails() {
     );
   };
 
-  /* ---------------- SHARE ---------------- */
 
   const handleShare = async () => {
     try {
@@ -162,7 +155,6 @@ function ProductDetails() {
     } catch {}
   };
 
-  /* ---------------- LOADING ---------------- */
 
   if (loading) {
     return (
@@ -182,7 +174,6 @@ function ProductDetails() {
     );
   }
 
-  /* ---------------- OWNER CHECK ---------------- */
 
   const loggedInId = user?._id ?? user?.id;
   const sellerId = product.seller?._id || product.seller;
@@ -192,21 +183,17 @@ function ProductDetails() {
     sellerId &&
     String(loggedInId) === String(sellerId);
 
-  /* ---------------- UI ---------------- */
 
   return (
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 bg-slate-900 p-8 rounded-3xl border border-slate-800">
 
-        {/* IMAGE */}
         <div className="aspect-square bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
           <ImageSlider images={product.images} />
         </div>
 
-        {/* DETAILS */}
         <div>
 
-          {/* CATEGORY */}
           {isEditing ? (
             <select
               value={editData.category}
@@ -231,7 +218,6 @@ function ProductDetails() {
             </span>
           )}
 
-          {/* TITLE */}
           {isEditing ? (
             <input
               className="w-full bg-slate-950 border border-blue-500 rounded-xl px-4 py-2 mt-4 text-white text-3xl font-bold"
@@ -246,7 +232,6 @@ function ProductDetails() {
             </h1>
           )}
 
-          {/* PRICE */}
           {isEditing ? (
             <input
               type="number"
@@ -270,7 +255,6 @@ function ProductDetails() {
             </p>
           )}
 
-          {/* SELLER */}
           <div className="mt-6">
             <p className="text-slate-400 text-sm">Seller</p>
 
@@ -282,7 +266,6 @@ function ProductDetails() {
             </Link>
           </div>
 
-          {/* DESCRIPTION */}
           {isEditing ? (
             <div className="mt-6">
               <textarea
@@ -306,7 +289,6 @@ function ProductDetails() {
             </p>
           )}
 
-          {/* ACTIONS */}
           <div className="mt-8 flex gap-6">
             <button
               onClick={handleContact}
@@ -323,7 +305,6 @@ function ProductDetails() {
             </button>
           </div>
 
-          {/* OWNER CONTROLS */}
           {isOwner && (
             <div className="flex gap-3 mt-6">
               {isEditing ? (

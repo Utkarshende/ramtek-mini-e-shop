@@ -16,7 +16,6 @@ function ImageSlider({ images = [], className = "" }) {
     setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
-  // Close modal on ESC
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") setIsOpen(false);
@@ -35,7 +34,6 @@ function ImageSlider({ images = [], className = "" }) {
 
   return (
     <>
-      {/* MAIN IMAGE */}
       <div className={`relative ${className}`}>
         <img
           src={images[current]}
@@ -62,7 +60,6 @@ function ImageSlider({ images = [], className = "" }) {
               ›
             </button>
 
-            {/* Slide Indicator */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs bg-black/60 text-white px-3 py-1 rounded-full">
               {current + 1} / {images.length}
             </div>
@@ -70,7 +67,7 @@ function ImageSlider({ images = [], className = "" }) {
         )}
       </div>
 
-      {/* MODAL */}
+   
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/95 flex items-center justify-center z-50"

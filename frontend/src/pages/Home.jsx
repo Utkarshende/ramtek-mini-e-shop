@@ -15,7 +15,6 @@ function Home() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState("");
 
-  /* ================= FETCH PRODUCTS ================= */
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -51,13 +50,11 @@ function Home() {
     return () => clearTimeout(debounce);
   }, [selectedCategory, searchTerm]);
 
-  /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADER */}
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
             Explore <span className="text-blue-500">{APP_NAME}</span>
@@ -67,10 +64,8 @@ function Home() {
           </p>
         </div>
 
-        {/* SEARCH + FILTER */}
         <div className="flex flex-col md:flex-row gap-4 items-center bg-slate-900 p-4 rounded-3xl border border-slate-800 mb-12 shadow-2xl">
 
-          {/* SEARCH */}
           <div className="relative w-full md:flex-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
               🔍
@@ -85,7 +80,6 @@ function Home() {
             />
           </div>
 
-          {/* CATEGORY */}
           <select
             className="w-full md:w-64 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white outline-none cursor-pointer focus:border-blue-500 transition-all"
             value={selectedCategory}
@@ -99,7 +93,6 @@ function Home() {
           </select>
         </div>
 
-        {/* INITIAL SERVER WAKE */}
         {isInitialLoad && loading ? (
           <div className="flex flex-col justify-center items-center h-96 text-center space-y-6">
             <div className="text-blue-500 animate-spin text-5xl">⚙️</div>
@@ -115,7 +108,6 @@ function Home() {
           </div>
         ) : (
           <>
-            {/* NORMAL LOADING */}
             {loading && (
               <div className="flex justify-center items-center py-20">
                 <div className="text-blue-500 animate-spin text-4xl">
@@ -124,14 +116,12 @@ function Home() {
               </div>
             )}
 
-            {/* ERROR STATE */}
             {error && !loading && (
               <div className="text-center text-red-400 py-20">
                 {error}
               </div>
             )}
 
-            {/* PRODUCT GRID */}
             {!loading && !error && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {products.length > 0 ? (

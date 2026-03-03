@@ -21,7 +21,6 @@ function Navbar() {
   return (
     <nav className="bg-slate-950 border-b border-slate-900 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
       
-      {/* LEFT SIDE */}
       <div className="flex items-center gap-8">
         <NavLink
           to="/"
@@ -30,7 +29,6 @@ function Navbar() {
           {APP_NAME}
         </NavLink>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex gap-6 text-sm uppercase tracking-widest">
           <NavLink to="/" className={linkStyle}>Home</NavLink>
           <NavLink to="/about" className={linkStyle}>About</NavLink>
@@ -43,7 +41,6 @@ function Navbar() {
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
       <div className="flex items-center gap-5">
 
         {user ? (
@@ -69,7 +66,6 @@ function Navbar() {
           </NavLink>
         )}
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden text-slate-400 text-xl"
           onClick={() => setIsOpen(!isOpen)}
@@ -78,7 +74,6 @@ function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
       {isOpen && (
         <div className="absolute top-full left-0 w-full bg-slate-950 border-t border-slate-900 flex flex-col items-center gap-4 py-6 md:hidden">
           <NavLink to="/" className={linkStyle} onClick={() => setIsOpen(false)}>Home</NavLink>

@@ -22,7 +22,6 @@ function SellProduct() {
     phoneNumber: "",
   });
 
-  /* ---------------- CLEANUP PREVIEWS ---------------- */
 
   useEffect(() => {
     return () => {
@@ -30,7 +29,6 @@ function SellProduct() {
     };
   }, [previews]);
 
-  /* ---------------- IMAGE HANDLER ---------------- */
 
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -54,7 +52,6 @@ function SellProduct() {
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  /* ---------------- VALIDATION ---------------- */
 
   const validateForm = () => {
     if (!formData.title.trim())
@@ -81,7 +78,6 @@ function SellProduct() {
     return null;
   };
 
-  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,7 +114,6 @@ function SellProduct() {
     }
   };
 
-  /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 flex justify-center text-white">
@@ -130,7 +125,6 @@ function SellProduct() {
           RAMTEK <span className="text-blue-500">BAZAR</span>
         </h2>
 
-        {/* IMAGE SECTION */}
         <div>
           <label className="text-sm text-slate-400">
             Product Photos (Max 5)
@@ -167,7 +161,6 @@ function SellProduct() {
           </div>
         </div>
 
-        {/* FORM FIELDS */}
 
         <InputField
           label="Item Title"
@@ -246,7 +239,6 @@ function SellProduct() {
           }
         />
 
-        {/* CATEGORY */}
         <div>
           <label className="block text-sm font-semibold text-slate-300 mb-2">
             Category

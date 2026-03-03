@@ -29,7 +29,6 @@ function SellerProfile() {
     fetchSellerData();
   }, [id]);
 
-  /* ---------------- LOADING STATE ---------------- */
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -40,7 +39,6 @@ function SellerProfile() {
     );
   }
 
-  /* ---------------- NOT FOUND STATE ---------------- */
   if (!seller) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
@@ -49,20 +47,16 @@ function SellerProfile() {
     );
   }
 
-  /* ---------------- MAIN UI ---------------- */
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-12">
       <div className="max-w-6xl mx-auto">
 
-        {/* -------- SELLER HEADER -------- */}
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl mb-12 flex flex-col md:flex-row items-center gap-8">
 
-          {/* Avatar */}
           <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-3xl font-bold text-white">
             {seller.name?.charAt(0).toUpperCase() || "U"}
           </div>
 
-          {/* Seller Info */}
           <div className="text-center md:text-left">
             <h1 className="text-3xl font-bold text-white">
               {seller.name}
@@ -89,7 +83,6 @@ function SellerProfile() {
           </div>
         </div>
 
-        {/* -------- PRODUCTS SECTION -------- */}
         <h2 className="text-2xl font-bold text-white mb-8 border-b border-slate-800 pb-4">
           Listings from {seller.name}
         </h2>

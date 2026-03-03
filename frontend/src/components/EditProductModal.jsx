@@ -16,7 +16,6 @@ function EditProductModal({ product, onClose, onUpdate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  /* ---------------- HANDLE CHANGE ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -26,7 +25,6 @@ function EditProductModal({ product, onClose, onUpdate }) {
     }));
   };
 
-  /* ---------------- WORD COUNT ---------------- */
   const wordCount = useMemo(() => {
     return formData.description
       .trim()
@@ -34,7 +32,6 @@ function EditProductModal({ product, onClose, onUpdate }) {
       .filter(Boolean).length;
   }, [formData.description]);
 
-  /* ---------------- VALIDATION ---------------- */
   const validateForm = () => {
     if (!formData.name.trim()) {
       return MESSAGES.productNameRequired;
@@ -55,7 +52,6 @@ function EditProductModal({ product, onClose, onUpdate }) {
     return null;
   };
 
-  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,7 +81,6 @@ function EditProductModal({ product, onClose, onUpdate }) {
     }
   };
 
-  /* ---------------- UI ---------------- */
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md p-8 rounded-3xl shadow-2xl">

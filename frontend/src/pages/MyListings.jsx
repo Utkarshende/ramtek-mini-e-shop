@@ -11,7 +11,6 @@ function MyListings() {
 
   const navigate = useNavigate();
 
-  /* ================= FETCH MY PRODUCTS ================= */
 
   const fetchMyProducts = async () => {
     try {
@@ -30,7 +29,6 @@ function MyListings() {
     fetchMyProducts();
   }, []);
 
-  /* ================= DELETE PRODUCT ================= */
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
@@ -59,7 +57,6 @@ function MyListings() {
     }
   };
 
-  /* ================= LOADING STATE ================= */
 
   if (loading) {
     return (
@@ -71,7 +68,6 @@ function MyListings() {
     );
   }
 
-  /* ================= ERROR STATE ================= */
 
   if (error) {
     return (
@@ -81,13 +77,11 @@ function MyListings() {
     );
   }
 
-  /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-12">
       <div className="max-w-4xl mx-auto">
 
-        {/* HEADER */}
         <header className="flex justify-between items-end mb-10">
           <div>
             <h1 className="text-4xl font-extrabold text-white tracking-tight">
@@ -108,7 +102,6 @@ function MyListings() {
           </div>
         </header>
 
-        {/* LISTS */}
         <div className="space-y-4">
           {myProducts.length > 0 ? (
             myProducts.map((item) => (
@@ -116,7 +109,6 @@ function MyListings() {
                 key={item._id}
                 className="group flex flex-col md:flex-row items-center gap-6 bg-slate-900/50 border border-slate-800 p-5 rounded-3xl hover:bg-slate-900 hover:border-blue-500/30 transition-all duration-300"
               >
-                {/* IMAGE */}
                 <div className="w-full md:w-24 h-24 overflow-hidden rounded-2xl border border-slate-800 bg-slate-800">
                   {item.images?.[0] ? (
                     <img
@@ -131,7 +123,6 @@ function MyListings() {
                   )}
                 </div>
 
-                {/* DETAILS */}
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-white text-lg font-bold group-hover:text-blue-400 transition-colors">
                     {item.title}
@@ -152,7 +143,6 @@ function MyListings() {
                   </div>
                 </div>
 
-                {/* ACTIONS */}
                 <div className="flex gap-3 w-full md:w-auto">
                   <Link
                     to={`/product/${item._id}`}
@@ -174,7 +164,6 @@ function MyListings() {
               </div>
             ))
           ) : (
-            /* EMPTY STATE */
             <div className="text-center py-24 border-2 border-dashed border-slate-900 rounded-[40px] bg-slate-900/20">
               <div className="text-5xl mb-4">📦</div>
 
