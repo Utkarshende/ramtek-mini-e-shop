@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        ramtekRed: "#FF4D4D", // Adding our constant color here
+        ramtekRed: "#FF4D4D", 
       },
     },
   },
