@@ -5,7 +5,7 @@ import InputField from "../components/ui/InputField";
 import { toast } from "react-toastify";
 import { COLORS } from "../config/theme";
 import { MESSAGES } from "../config/messages";
-import { VALIDATIONr } from "../utils/validation.js";
+import { VALIDATION } from "../utils/validation.js";
 function Login() {
   const navigate = useNavigate();
 
